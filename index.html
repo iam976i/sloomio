@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLOOMIO — We Weave Careers</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0C;--bg2:#111115;--bg3:#18181F;--bg4:#1E1E26;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);
+  --tx:#F0EEF8;--mu:#7A788A;
+  --ac:#8B5CF6;--ac2:#A78BFA;
+  --gn:#10B981;--am:#F59E0B;--rd:#EF4444;--bl:#3B82F6;--pk:#EC4899;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+input,button,select,textarea{font-family:inherit}
+
+/* ── AUTH ── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+.auth-glow{position:fixed;top:25%;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none}
+.auth-box{width:100%;max-width:380px;position:relative}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-icon{width:52px;height:52px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+.auth-title{font-size:24px;font-weight:700;color:var(--tx)}
+.auth-sub{font-size:13px;color:var(--mu);margin-top:4px}
+.auth-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;padding:28px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:6px}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;color:var(--tx);font-size:14px;outline:none;transition:border .15s}
+.field input:focus{border-color:var(--ac)}
+.btn-primary{width:100%;padding:12px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px}
+.btn-primary:hover{background:#7C3AED}
+.auth-link{text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);font-size:13px;color:var(--mu)}
+.auth-link a{color:var(--ac2);text-decoration:none;font-weight:500}
+.auth-link a:hover{color:var(--tx)}
+.auth-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#FCA5A5;margin-bottom:14px;display:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--tx);z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,.4);color:#6EE7B7}
+.toast.error{border-color:rgba(239,68,68,.4);color:#FCA5A5}
+
+/* ── APP SHELL ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:18px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb-logo-name{font-weight:700;font-size:14px}
+.sb-logo-plan{font-size:9px;color:var(--ac2);font-weight:600;margin-top:1px}
+.sb-artist{margin:10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#EC4899);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-artist-name{font-size:12px;font-weight:600;flex:1}
+.sb-artist-sub{font-size:10px;color:var(--mu)}
+nav{flex:1;padding:6px}
+.nav-section{margin-bottom:2px}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);padding:8px 8px 3px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--mu);font-size:12px;transition:all .12s;margin-bottom:1px;text-decoration:none}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.nav-item.active{background:rgba(139,92,246,.15);color:var(--ac2);font-weight:600}
+.nav-icon{font-size:13px;width:15px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--ac);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;min-width:18px;text-align:center}
+.nav-badge.g{background:var(--gn)}
+.nav-badge.a{background:var(--am);color:#1a0}
+.sb-footer{border-top:1px solid var(--bd);padding:12px}
+.plan-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:12px}
+.plan-title{font-size:10px;color:var(--ac2);font-weight:700;margin-bottom:3px}
+.plan-text{font-size:10px;color:var(--mu);margin-bottom:8px;line-height:1.4}
+.plan-btn{width:100%;padding:7px;background:var(--ac);border:none;border-radius:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer}
+.logout-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--mu);font-size:12px;cursor:pointer;background:none;border:none;margin-top:8px;transition:all .12s}
+.logout-btn:hover{background:rgba(239,68,68,.08);color:var(--rd)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:14px;padding:0 22px;background:rgba(10,10,12,.8);flex-shrink:0}
+.topbar-title{font-weight:700;font-size:16px;flex:1}
+.topbar-search{position:relative}
+.topbar-search input{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:6px 12px 6px 30px;color:var(--tx);font-size:12px;width:180px;outline:none}
+.topbar-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:13px;pointer-events:none}
+.ia-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:8px;color:var(--ac2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.ia-btn:hover{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.5)}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-weight:600;font-size:13px}
+.card-action{font-size:11px;color:var(--ac2);cursor:pointer;background:none;border:none;transition:color .12s}
+.card-action:hover{color:var(--tx)}
+.card-body{padding:14px 16px}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px}
+.stat-value{font-size:22px;font-weight:700;margin-bottom:4px}
+.stat-delta{font-size:11px}
+.delta-up{color:var(--gn)}
+.stat-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:10px}
+.stat-fill{height:100%;border-radius:2px}
+
+/* ── AI BANNER ── */
+.ai-banner{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(236,72,153,.05));border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:16px 18px;display:flex;gap:14px;margin-bottom:18px}
+.ai-avatar{width:40px;height:40px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ai-content{flex:1}
+.ai-label{font-size:9px;color:var(--ac2);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+.ai-msg{font-size:13px;line-height:1.5;margin-bottom:10px}
+.ai-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ai-action-btn{padding:5px 12px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:6px;color:var(--ac2);font-size:11px;font-weight:500;cursor:pointer;transition:all .12s}
+.ai-action-btn:hover{background:rgba(139,92,246,.25)}
+
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-7-5{display:grid;grid-template-columns:7fr 5fr;gap:14px}
+
+/* ── TABLE ── */
+.os-table{width:100%;border-collapse:collapse;font-size:13px}
+.os-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);padding:8px 12px;text-align:left;border-bottom:1px solid var(--bd)}
+.os-table td{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.os-table tr:last-child td{border-bottom:none}
+.os-table tbody tr{transition:background .1s;cursor:pointer}
+.os-table tbody tr:hover{background:var(--bg3)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-purple{background:rgba(139,92,246,.15);color:var(--ac2);border:1px solid rgba(139,92,246,.25)}
+.badge-green{background:rgba(16,185,129,.15);color:var(--gn);border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--am);border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
+.badge-blue{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.25)}
+.badge-pink{background:rgba(236,72,153,.15);color:var(--pk);border:1px solid rgba(236,72,153,.25)}
+.badge-gray{background:var(--bg3);color:var(--mu);border:1px solid var(--bd)}
+
+/* ── ROWS ── */
+.list-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.list-row:last-child{border:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.row-name{font-size:12px;font-weight:600}
+.row-sub{font-size:10px;color:var(--mu)}
+.score{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.score-hi{background:rgba(16,185,129,.15);color:var(--gn)}
+.score-md{background:rgba(245,158,11,.15);color:var(--am)}
+.score-lo{background:rgba(139,92,246,.15);color:var(--ac2)}
+.ghost-btn{padding:4px 10px;background:transparent;border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:10px;cursor:pointer;transition:all .12s}
+.ghost-btn:hover{border-color:var(--ac2);color:var(--ac2)}
+
+/* ── PROGRESS ── */
+.prog-row{margin-bottom:10px}
+.prog-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;color:var(--mu)}
+.prog-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* ── PIPELINE ── */
+.pipe-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pipe-col-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.pipe-count{background:var(--bg3);border-radius:8px;padding:1px 6px;font-size:9px}
+.pipe-card{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:7px;cursor:pointer;transition:border .12s}
+.pipe-card:hover{border-color:var(--bd2)}
+.pipe-venue{font-size:12px;font-weight:600;margin-bottom:3px}
+.pipe-detail{font-size:10px;color:var(--mu);margin-bottom:5px}
+.pipe-fee{font-size:12px;font-weight:700;color:var(--gn)}
+.pipe-add{border:1px dashed var(--bd2);border-radius:8px;padding:8px;text-align:center;font-size:11px;color:var(--mu);cursor:pointer;transition:all .12s}
+.pipe-add:hover{border-color:var(--ac2);color:var(--ac2)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:480px;animation:slideUp .25s ease}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-weight:700;font-size:15px}
+.modal-close{background:none;border:none;color:var(--mu);font-size:20px;cursor:pointer;line-height:1;padding:0}
+.modal-close:hover{color:var(--tx)}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-field{margin-bottom:12px}
+.form-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:5px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none;transition:border .15s}
+.form-input:focus{border-color:var(--ac)}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none;appearance:none;cursor:pointer}
+.btn-secondary{padding:8px 18px;background:transparent;border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:13px;font-weight:500;cursor:pointer;transition:all .12s}
+.btn-secondary:hover{background:var(--bg3)}
+.btn-accent{padding:8px 18px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s}
+.btn-accent:hover{background:#7C3AED}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── FINANCE ── */
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.fin-row:last-child{border:none}
+.fin-label{color:var(--mu)}
+.fin-pos{color:var(--gn);font-weight:600}
+.fin-neg{color:var(--rd);font-weight:600}
+
+/* ── ONBOARDING ── */
+.onboard-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+.onboard-box{width:100%;max-width:520px}
+.onboard-progress{display:flex;gap:8px;margin-bottom:28px}
+.onboard-step{height:4px;flex:1;border-radius:2px;background:var(--bg3);transition:background .3s}
+.onboard-step.done{background:var(--ac)}
+.genre-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.genre-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--bd2);color:var(--mu);font-size:12px;cursor:pointer;transition:all .15s}
+.genre-chip.selected{background:var(--ac);border-color:var(--ac);color:#fff}
+
+/* ── SOCIAL CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-day-label{font-size:10px;color:var(--mu);font-weight:600;text-align:center;margin-bottom:6px}
+.cal-slot{border:1px solid var(--bd);border-radius:6px;padding:5px 3px;margin-bottom:5px;font-size:9px;text-align:center;cursor:pointer;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .12s}
+.cal-slot.ig{background:rgba(236,72,153,.1);border-color:rgba(236,72,153,.25);color:var(--pk)}
+.cal-slot.yt{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--rd)}
+.cal-slot.tk{background:rgba(20,184,166,.1);border-color:rgba(20,184,166,.25);color:#2DD4BF}
+.cal-slot.empty{color:var(--mu)}
+.cal-slot.empty:hover{border-color:var(--ac2);color:var(--ac2)}
+
+/* ── ANALYTICS BARS ── */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px;margin-top:10px}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{border-radius:3px 3px 0 0;width:100%;transition:height .5s;min-height:4px}
+.bar-label{font-size:9px;color:var(--mu)}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.animate-in{animation:fadeIn .3s ease}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div id="screen-login" class="auth-wrap">
+  <div class="auth-glow"></div>
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">SLOOMIO</div>
+      <div class="auth-sub">We Weave Careers.</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-error" id="login-error">Email ou mot de passe incorrect</div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="artiste@example.com" value="demo@sloomio.com">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="login-pass" placeholder="••••••••" value="demo1234">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Se connecter</button>
+      <div class="auth-link">
+        Pas encore de compte ? <a href="#" onclick="showScreen('register')">Créer un compte</a>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--mu);margin-top:12px">
+      Démo : demo@sloomio.com / demo1234
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     REGISTER
+════════════════════════════════════════ -->
+<div id="screen-register" class="auth-wrap" style="display:none">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">SLOOMIO</div>
+      <div class="auth-sub">Crée ton compte gratuit</div>
+    </div>
+    <div class="auth-card">
+      <div class="field"><label>Nom complet</label><input type="text" id="reg-name" placeholder="DJ Kael"></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="dj@example.com"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="reg-pass" placeholder="Min. 8 caractères"></div>
+      <div class="field"><label>Confirmer</label><input type="password" id="reg-confirm" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doRegister()">Créer mon compte</button>
+      <div class="auth-link">Déjà inscrit ? <a href="#" onclick="showScreen('login')">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ONBOARDING
+════════════════════════════════════════ -->
+<div id="screen-onboard" class="onboard-wrap" style="display:none">
+  <div class="onboard-box">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">Configurons ton profil</div>
+      <div class="auth-sub" id="onboard-step-label">Étape 1 sur 2</div>
+    </div>
+    <div class="onboard-progress">
+      <div class="onboard-step done" id="ostep1"></div>
+      <div class="onboard-step" id="ostep2"></div>
+    </div>
+
+    <div id="onboard-p1">
+      <div class="auth-card">
+        <div class="field"><label>Nom d'artiste / Pseudo</label><input type="text" id="ob-name" placeholder="DJ Kael"></div>
+        <div class="field">
+          <label>Pays</label>
+          <select class="form-select" id="ob-country" style="width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;color:var(--tx);outline:none">
+            <option value="FR">🇫🇷 France</option>
+            <option value="BE">🇧🇪 Belgique</option>
+            <option value="CH">🇨🇭 Suisse</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="GB">🇬🇧 UK</option>
+            <option value="DE">🇩🇪 Allemagne</option>
+            <option value="US">🇺🇸 USA</option>
+          </select>
+        </div>
+        <div class="field"><label>Bio courte (optionnel)</label><textarea class="form-input" id="ob-bio" rows="2" placeholder="Artiste électronique basé à Paris..." style="resize:none"></textarea></div>
+        <button class="btn-primary" onclick="onboardNext()">Continuer →</button>
+      </div>
+    </div>
+
+    <div id="onboard-p2" style="display:none">
+      <div class="auth-card">
+        <div class="field">
+          <label>Genres musicaux (choix multiples)</label>
+          <div class="genre-grid" id="genre-grid">
+            <div class="genre-chip" onclick="toggleGenre(this)">House</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Techno</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Electronic</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Deep House</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Hip-Hop</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">R&B</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Pop</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Rock</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Jazz</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Soul</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Reggae</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Afrobeat</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Latin</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Classique</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Autre</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn-secondary" style="flex:1" onclick="onboardBack()">← Retour</button>
+          <button class="btn-primary" style="flex:2" onclick="onboardFinish()">🚀 Lancer SLOOMIO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     APP
+════════════════════════════════════════ -->
+<div id="screen-app" class="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎵</div>
+      <div>
+        <div class="sb-logo-name">SLOOMIO</div>
+        <div class="sb-logo-plan">● PRO PLAN</div>
+      </div>
+    </div>
+
+    <div class="sb-artist">
+      <div class="sb-av" id="sb-initials">DJ</div>
+      <div>
+        <div class="sb-artist-name" id="sb-artist-name">DJ Kael</div>
+        <div class="sb-artist-sub" id="sb-artist-genre">Electronic · House</div>
+      </div>
+      <span style="margin-left:auto;color:var(--mu);font-size:11px">▾</span>
+    </div>
+
+    <nav>
+      <div class="nav-section">
+        <div class="nav-label">Dashboard</div>
+        <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">⬡</span> Vue globale</div>
+        <div class="nav-item" onclick="goPage('ia',this)"><span class="nav-icon">✦</span> IA Manager <span class="nav-badge">7</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Croissance</div>
+        <div class="nav-item" onclick="goPage('radar',this)"><span class="nav-icon">◎</span> Radar <span class="nav-badge g">23</span></div>
+        <div class="nav-item" onclick="goPage('crm',this)"><span class="nav-icon">◈</span> CRM</div>
+        <div class="nav-item" onclick="goPage('social',this)"><span class="nav-icon">◇</span> Réseaux sociaux</div>
+        <div class="nav-item" onclick="goPage('playlisting',this)"><span class="nav-icon">♫</span> Playlisting <span class="nav-badge a">5</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Business</div>
+        <div class="nav-item" onclick="goPage('booking',this)"><span class="nav-icon">◆</span> Booking & Live</div>
+        <div class="nav-item" onclick="goPage('finance',this)"><span class="nav-icon">◑</span> Finance</div>
+        <div class="nav-item" onclick="goPage('documents',this)"><span class="nav-icon">▣</span> Documents</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Création</div>
+        <div class="nav-item" onclick="goPage('production',this)"><span class="nav-icon">▷</span> Production</div>
+        <div class="nav-item" onclick="goPage('studio',this)"><span class="nav-icon">✦</span> Studio IA</div>
+        <div class="nav-item" onclick="goPage('analytics',this)"><span class="nav-icon">◭</span> Analytics</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Compte</div>
+        <div class="nav-item" onclick="goPage('settings',this)"><span class="nav-icon">⚙</span> Paramètres</div>
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="plan-box">
+        <div class="plan-title">✦ Plan PRO actif</div>
+        <div class="plan-text">3 profils · CRM illimité · IA avancée</div>
+        <button class="plan-btn">Passer Label ↗</button>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">⏻ Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Vue globale</div>
+      <div class="topbar-search">
+        <span class="topbar-search-icon">⌕</span>
+        <input type="text" placeholder="Rechercher...">
+      </div>
+      <button class="ia-btn" onclick="goPage('ia',null)">✦ IA Manager</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="page-dashboard" class="page active animate-in">
+        <div class="ai-banner">
+          <div class="ai-avatar">✦</div>
+          <div class="ai-content">
+            <div class="ai-label">IA MANAGER · Aujourd'hui</div>
+            <div class="ai-msg">Bonjour <strong id="banner-name">DJ Kael</strong> ! J'ai détecté <strong>3 opportunités prioritaires</strong> : Radio FG cherche des tracks house pour sa grille de nuit, le festival Nuits Électriques a ouvert ses candidatures (deadline J-12), et 5 curateurs Spotify ont récemment ajouté des artistes similaires.</div>
+            <div class="ai-actions">
+              <button class="ai-action-btn" onclick="goPage('radar',null)">◎ Voir opportunités</button>
+              <button class="ai-action-btn" onclick="goPage('crm',null)">◈ Ouvrir CRM</button>
+              <button class="ai-action-btn" onclick="goPage('playlisting',null)">♫ Curateurs</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-label">Streams totaux</div><div class="stat-value" style="color:var(--ac2)">284K</div><div class="stat-delta delta-up">▲ +12.4% ce mois</div><div class="stat-bar"><div class="stat-fill" style="width:68%;background:var(--ac)"></div></div></div>
+          <div class="stat"><div class="stat-label">Revenus (mois)</div><div class="stat-value" style="color:var(--gn)">€1 840</div><div class="stat-delta delta-up">▲ +8.2%</div><div class="stat-bar"><div class="stat-fill" style="width:55%;background:var(--gn)"></div></div></div>
+          <div class="stat"><div class="stat-label">Contacts CRM</div><div class="stat-value" style="color:#60A5FA">847</div><div class="stat-delta delta-up">▲ +34 cette semaine</div><div class="stat-bar"><div class="stat-fill" style="width:80%;background:var(--bl)"></div></div></div>
+          <div class="stat"><div class="stat-label">Pipeline Booking</div><div class="stat-value" style="color:var(--am)">€5 100</div><div class="stat-delta delta-up">▲ 4 opportunités</div><div class="stat-bar"><div class="stat-fill" style="width:60%;background:var(--am)"></div></div></div>
+        </div>
+
+        <div class="grid-7-5" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-head"><span class="card-title">◎ Radar — Top opportunités</span><button class="card-action" onclick="goPage('radar',null)">Voir tout →</button></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Radio FG</div><div class="row-sub">Radio · France · House/Electronic</div></div><span class="score score-hi">95%</span><button class="ghost-btn" style="margin-left:8px">Pitcher</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Nuits Électriques</div><div class="row-sub">Festival · Belgique · 8 000 pers.</div></div><span class="score score-hi">91%</span><button class="ghost-btn" style="margin-left:8px">Candidater</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Club Rex — Paris</div><div class="row-sub">Club · France · Électronique</div></div><span class="score score-md">78%</span><button class="ghost-btn" style="margin-left:8px">Contacter</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="row-name">Studio La Frette</div><div class="row-sub">Résidence artistique · France</div></div><span class="score score-lo">64%</span><button class="ghost-btn" style="margin-left:8px">Explorer</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">◆ Pipeline Booking</span><button class="card-action" onclick="goPage('booking',null)">Voir →</button></div>
+            <div class="card-body">
+              <div class="list-row"><div style="flex:1"><div class="row-name">Fabric London</div><div class="row-sub">Contact envoyé · 3j</div></div><span class="badge badge-blue">Contacté</span><span style="color:var(--gn);font-weight:700;font-size:13px;margin-left:8px">€1 200</span></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Club Social</div><div class="row-sub">Contrat en cours</div></div><span class="badge badge-amber">Négociation</span><span style="color:var(--gn);font-weight:700;font-size:13px;margin-left:8px">€800</span></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Berghain</div><div class="row-sub">À contacter</div></div><span class="badge badge-gray">Prospect</span><span style="color:var(--gn);font-weight:700;font-size:13px;margin-left:8px">€2 500</span></div>
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:var(--mu)">Pipeline total</span>
+                <span style="font-size:18px;font-weight:700;color:var(--gn)">€5 100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><span class="card-title">◈ CRM — Contacts récents</span><button class="card-action" onclick="goPage('crm',null)">Voir tout →</button></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(59,130,246,.15);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">MR</div>
+                <div style="flex:1;margin-left:10px"><div class="row-name">Marc Rousseau</div><div class="row-sub">Directeur · Radio FG</div></div>
+                <span class="badge badge-blue">Radio</span>
+              </div>
+              <div class="list-row">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(16,185,129,.15);color:#34D399;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">SC</div>
+                <div style="flex:1;margin-left:10px"><div class="row-name">Sophie Chen</div><div class="row-sub">Booking — Fabric London</div></div>
+                <span class="badge badge-amber">Booking</span>
+              </div>
+              <div class="list-row">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(139,92,246,.15);color:var(--ac2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">AK</div>
+                <div style="flex:1;margin-left:10px"><div class="row-name">Alex Kim</div><div class="row-sub">Curateur — Spotify</div></div>
+                <span class="badge badge-purple">Curateur</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">◑ Finance — Ce mois</span><button class="card-action" onclick="goPage('finance',null)">Détail →</button></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="fin-row"><span class="fin-label">Streaming (Spotify/Apple)</span><span class="fin-pos">+ €620</span></div>
+              <div class="fin-row"><span class="fin-label">Live — Club Social</span><span class="fin-pos">+ €800</span></div>
+              <div class="fin-row"><span class="fin-label">Sync — Pub Renault</span><span class="fin-pos">+ €420</span></div>
+              <div class="fin-row"><span class="fin-label">Location studio</span><span class="fin-neg">- €280</span></div>
+              <div class="fin-row"><span class="fin-label">SLOOMIO Pro</span><span class="fin-neg">- €29</span></div>
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:var(--mu)">Solde net</span>
+                <span style="font-size:18px;font-weight:700;color:var(--gn)">+ €1 531</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── IA MANAGER ── -->
+      <div id="page-ia" class="page animate-in">
+        <div class="ai-banner" style="margin-bottom:20px">
+          <div class="ai-avatar">✦</div>
+          <div class="ai-content">
+            <div class="ai-label">IA MANAGER · Mode conversationnel</div>
+            <div class="ai-msg">Je suis ton manager IA. Dis-moi ce que tu veux accomplir et je génère emails, stratégies, plans de contenu et analyses en quelques secondes.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:680px">
+          <div class="ia-action-row" onclick="showIAResult('email')">
+            <div class="card" style="cursor:pointer;margin-bottom:0;transition:border .15s" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+              <div class="card-body" style="display:flex;align-items:center;gap:14px">
+                <div style="width:36px;height:36px;border-radius:9px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✉</div>
+                <div style="flex:1"><div style="font-weight:600;font-size:14px;margin-bottom:2px">Email de pitch</div><div style="font-size:12px;color:var(--mu)">Génère un email pro pour radios, festivals, bookers, labels</div></div>
+                <span style="color:var(--ac2);font-size:18px">→</span>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIAResult('bio')" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="display:flex;align-items:center;gap:14px">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📝</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14px;margin-bottom:2px">Biographie artiste</div><div style="font-size:12px;color:var(--mu)">Bio courte ou longue, FR ou EN, ton professionnel</div></div>
+              <span style="color:var(--ac2);font-size:18px">→</span>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIAResult('social')" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="display:flex;align-items:center;gap:14px">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(236,72,153,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">◇</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14px;margin-bottom:2px">Plan social media</div><div style="font-size:12px;color:var(--mu)">Calendrier éditorial 1 semaine · IG · TikTok · YouTube</div></div>
+              <span style="color:var(--ac2);font-size:18px">→</span>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIAResult('strategy')" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="display:flex;align-items:center;gap:14px">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⬡</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:14px;margin-bottom:2px">Stratégie 3 mois</div><div style="font-size:12px;color:var(--mu)">Plan de développement artistique complet avec KPIs</div></div>
+              <span style="color:var(--ac2);font-size:18px">→</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="ia-result" style="display:none;margin-top:20px;max-width:680px">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">✦ Résultat généré</span>
+              <button class="ghost-btn" onclick="copyIAResult()">📋 Copier</button>
+            </div>
+            <div class="card-body">
+              <div id="ia-result-text" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--tx)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RADAR ── -->
+      <div id="page-radar" class="page animate-in">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="ghost-btn" style="background:var(--ac);border-color:var(--ac);color:#fff">Tous</button>
+          <button class="ghost-btn">📻 Radio</button>
+          <button class="ghost-btn">🎪 Festival</button>
+          <button class="ghost-btn">🎧 Club</button>
+          <button class="ghost-btn">🎙️ Studio</button>
+          <button class="ghost-btn" style="margin-left:auto;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--ac2)" onclick="toast('Scan IA lancé ! 23 nouvelles opportunités détectées.','success')">✦ Nouveau scan IA</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◎ 23 opportunités détectées</span></div>
+          <div class="card-body" style="padding:6px 16px">
+            <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Radio FG</div><div class="row-sub">Radio · France · House / Electronic · prog@radiofg.com</div></div><span class="badge badge-blue" style="margin-right:8px">Radio</span><span class="score score-hi">95%</span><button class="ghost-btn" style="margin-left:8px" onclick="toast('Email de pitch copié dans le presse-papier !','success')">✦ Pitcher</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Nuits Électriques</div><div class="row-sub">Festival · Belgique · 8 000 pers. · Électronique</div></div><span class="badge badge-green" style="margin-right:8px">Festival</span><span class="score score-hi">91%</span><button class="ghost-btn" style="margin-left:8px" onclick="openModal('modal-candidature')">Candidater</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Club Rex — Paris</div><div class="row-sub">Club · France · House / Techno · 800 pers.</div></div><span class="badge badge-amber" style="margin-right:8px">Club</span><span class="score score-md">78%</span><button class="ghost-btn" style="margin-left:8px" onclick="toast('Contact ajouté au CRM !','success')">+ CRM</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Rinse France</div><div class="row-sub">Radio web · France · Bass / Electronic</div></div><span class="badge badge-blue" style="margin-right:8px">Radio</span><span class="score score-md">74%</span><button class="ghost-btn" style="margin-left:8px" onclick="toast('Email de pitch copié !','success')">✦ Pitcher</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="row-name">Studio La Frette</div><div class="row-sub">Résidence · France · Tous styles · 2 semaines</div></div><span class="badge badge-purple" style="margin-right:8px">Studio</span><span class="score score-lo">64%</span><button class="ghost-btn" style="margin-left:8px">Explorer</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="row-name">Dour Festival</div><div class="row-sub">Festival · Belgique · 180 000 pers. · Electronic</div></div><span class="badge badge-green" style="margin-right:8px">Festival</span><span class="score score-lo">61%</span><button class="ghost-btn" style="margin-left:8px">Candidater</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--mu)"></div><div style="flex:1"><div class="row-name">Fabric London</div><div class="row-sub">Club · UK · Techno / House · 1 500 pers.</div></div><span class="badge badge-amber" style="margin-right:8px">Club</span><span class="score score-lo">58%</span><button class="ghost-btn" style="margin-left:8px">Contacter</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CRM ── -->
+      <div id="page-crm" class="page animate-in">
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <div style="flex:1;position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mu)">⌕</span>
+            <input type="text" style="width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px 8px 32px;color:var(--tx);font-size:13px;outline:none" placeholder="Rechercher un contact...">
+          </div>
+          <button class="ghost-btn">Type ▾</button>
+          <button class="ghost-btn">Statut ▾</button>
+          <button class="ghost-btn" onclick="toast('Importer votre fichier CSV','success')">↑ Import CSV</button>
+          <button class="btn-accent" onclick="openModal('modal-contact')">+ Ajouter</button>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-label">Total</div><div class="stat-value" style="font-size:22px;color:var(--ac2)">847</div></div>
+          <div class="stat"><div class="stat-label">Radio</div><div class="stat-value" style="font-size:22px;color:#60A5FA">124</div></div>
+          <div class="stat"><div class="stat-label">Festival</div><div class="stat-value" style="font-size:22px;color:var(--gn)">89</div></div>
+          <div class="stat"><div class="stat-label">Club</div><div class="stat-value" style="font-size:22px;color:var(--am)">203</div></div>
+          <div class="stat"><div class="stat-label">Label</div><div class="stat-value" style="font-size:22px;color:var(--pk)">67</div></div>
+          <div class="stat"><div class="stat-label">Curateur</div><div class="stat-value" style="font-size:22px;color:var(--ac2)">145</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">◈ 847 contacts</span><span style="font-size:11px;color:var(--mu)">Mis à jour il y a 2h</span></div>
+          <table class="os-table">
+            <thead><tr><th>Contact</th><th>Type</th><th>Statut</th><th>Pays</th><th>Dernier contact</th><th></th></tr></thead>
+            <tbody>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(59,130,246,.15);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">MR</div><div><div style="font-size:13px;font-weight:600">Marc Rousseau</div><div style="font-size:11px;color:var(--mu)">marc@radiofg.com</div></div></div></td><td><span class="badge badge-blue">Radio</span></td><td><span class="badge badge-purple">Pitché</span></td><td>🇫🇷 France</td><td style="color:var(--mu);font-size:12px">26/04/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Email généré par IA !','success')">✦ Email IA</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(16,185,129,.15);color:#34D399;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">SC</div><div><div style="font-size:13px;font-weight:600">Sophie Chen</div><div style="font-size:11px;color:var(--mu)">s.chen@fabric.co.uk</div></div></div></td><td><span class="badge badge-amber">Booking</span></td><td><span class="badge badge-amber">Négociation</span></td><td>🇬🇧 UK</td><td style="color:var(--mu);font-size:12px">24/04/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Email généré par IA !','success')">✦ Email IA</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(139,92,246,.15);color:var(--ac2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">AK</div><div><div style="font-size:13px;font-weight:600">Alex Kim</div><div style="font-size:11px;color:var(--mu)">alex@spotify-curator.com</div></div></div></td><td><span class="badge badge-purple">Curateur</span></td><td><span class="badge badge-blue">Contacté</span></td><td>🇺🇸 USA</td><td style="color:var(--mu);font-size:12px">22/04/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Pitch playlist généré !','success')">✦ Pitcher</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(236,72,153,.15);color:var(--pk);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">NB</div><div><div style="font-size:13px;font-weight:600">Nina Bauer</div><div style="font-size:11px;color:var(--mu)">n.bauer@defected.com</div></div></div></td><td><span class="badge badge-pink">Label</span></td><td><span class="badge badge-gray">Cold</span></td><td>🇬🇧 UK</td><td style="color:var(--mu);font-size:12px">18/04/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Email généré par IA !','success')">✦ Email IA</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(245,158,11,.15);color:var(--am);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">TL</div><div><div style="font-size:13px;font-weight:600">Thomas Lefèvre</div><div style="font-size:11px;color:var(--mu)">t.lefevre@labelle.fr</div></div></div></td><td><span class="badge badge-green">Festival</span></td><td><span class="badge badge-gray">Cold</span></td><td>🇫🇷 France</td><td style="color:var(--mu);font-size:12px">—</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Email généré par IA !','success')">✦ Email IA</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── BOOKING ── -->
+      <div id="page-booking" class="page animate-in">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:16px">
+            <div class="stat"><div class="stat-label">Opportunités</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">12</div></div>
+            <div class="stat"><div class="stat-label">Pipeline</div><div class="stat-value" style="font-size:20px;color:var(--am)">€14 200</div></div>
+            <div class="stat"><div class="stat-label">Confirmés</div><div class="stat-value" style="font-size:20px;color:var(--gn)">€2 400</div></div>
+            <div class="stat"><div class="stat-label">Conversion</div><div class="stat-value" style="font-size:20px;color:var(--bl)">23%</div></div>
+          </div>
+          <button class="btn-accent" onclick="openModal('modal-booking')">+ Ajouter</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◆ Pipeline Kanban</span></div>
+          <div class="card-body">
+            <div class="pipe-grid">
+              <div>
+                <div class="pipe-col-title">Prospect <span class="pipe-count">4</span></div>
+                <div class="pipe-card"><div class="pipe-venue">Berghain</div><div class="pipe-detail">Berlin · Techno · À contacter</div><div class="pipe-fee">€ 2 500</div></div>
+                <div class="pipe-card"><div class="pipe-venue">Corsica Studios</div><div class="pipe-detail">London · Electronic</div><div class="pipe-fee">€ 900</div></div>
+                <div class="pipe-add" onclick="openModal('modal-booking')">+ Ajouter</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Contacté <span class="pipe-count">3</span></div>
+                <div class="pipe-card"><div class="pipe-venue">Fabric London</div><div class="pipe-detail">Contact envoyé · 3j</div><div class="pipe-fee">€ 1 200</div></div>
+                <div class="pipe-card"><div class="pipe-venue">Club Rex Paris</div><div class="pipe-detail">Email envoyé · 1j</div><div class="pipe-fee">€ 700</div></div>
+                <div class="pipe-add">+ Ajouter</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Négociation <span class="pipe-count">3</span></div>
+                <div class="pipe-card" style="border-left:2px solid var(--am);border-radius:0 8px 8px 0"><div class="pipe-venue">Club Social</div><div class="pipe-detail">Contrat en cours</div><div class="pipe-fee">€ 800</div></div>
+                <div class="pipe-card" style="border-left:2px solid var(--am);border-radius:0 8px 8px 0"><div class="pipe-venue">La Marquise</div><div class="pipe-detail">Relance J+2</div><div class="pipe-fee">€ 600</div></div>
+                <div class="pipe-add">+ Ajouter</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Confirmé ✓ <span class="pipe-count">2</span></div>
+                <div class="pipe-card" style="border-left:2px solid var(--gn);border-radius:0 8px 8px 0"><div class="pipe-venue">Rex Club Paris</div><div class="pipe-detail">14 Mai 2026 · Signé</div><div class="pipe-fee">€ 1 200</div></div>
+                <div class="pipe-card" style="border-left:2px solid var(--gn);border-radius:0 8px 8px 0"><div class="pipe-venue">Nuits Sonores</div><div class="pipe-detail">22 Mai 2026</div><div class="pipe-fee">€ 1 500</div></div>
+                <div class="pipe-add">+ Ajouter</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FINANCE ── -->
+      <div id="page-finance" class="page animate-in">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:16px">
+            <div class="stat"><div class="stat-label">Revenus YTD</div><div class="stat-value" style="color:var(--gn)">€8 420</div><div class="stat-delta delta-up">▲ +18% vs N-1</div></div>
+            <div class="stat"><div class="stat-label">Dépenses YTD</div><div class="stat-value" style="color:var(--rd)">€2 140</div></div>
+            <div class="stat"><div class="stat-label">Bénéfice net</div><div class="stat-value" style="color:var(--ac2)">€6 280</div><div class="stat-delta delta-up">Marge 74%</div></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="ghost-btn" onclick="toast('Export CSV téléchargé !','success')">↓ CSV</button>
+            <button class="ghost-btn" onclick="toast('Export PDF téléchargé !','success')">↓ PDF</button>
+            <button class="btn-accent" onclick="openModal('modal-finance')">+ Transaction</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◑ Toutes les transactions</span><span style="font-size:12px;color:var(--mu)">Mois en cours</span></div>
+          <table class="os-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Catégorie</th><th style="text-align:right">Montant</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--mu);font-size:12px">25/04</td><td>Streaming Spotify / DistroKid</td><td><span class="badge badge-purple">Streaming</span></td><td style="text-align:right;color:var(--gn);font-weight:600">+ €620</td><td><span class="badge badge-green">Payé</span></td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">22/04</td><td>Cachet — Club Social (22/04)</td><td><span class="badge badge-blue">Live</span></td><td style="text-align:right;color:var(--gn);font-weight:600">+ €800</td><td><span class="badge badge-green">Payé</span></td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">18/04</td><td>Sync — Pub Renault (30s)</td><td><span class="badge badge-amber">Sync</span></td><td style="text-align:right;color:var(--gn);font-weight:600">+ €420</td><td><span class="badge badge-green">Payé</span></td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">15/04</td><td>Location Studio — 2 jours</td><td><span class="badge badge-gray">Studio</span></td><td style="text-align:right;color:var(--rd);font-weight:600">- €280</td><td><span class="badge badge-green">Payé</span></td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">01/04</td><td>SLOOMIO Pro — Avril</td><td><span class="badge badge-gray">Abonnement</span></td><td style="text-align:right;color:var(--rd);font-weight:600">- €29</td><td><span class="badge badge-green">Payé</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SOCIAL ── -->
+      <div id="page-social" class="page animate-in">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:16px">
+            <div class="stat"><div class="stat-label">Instagram</div><div class="stat-value" style="font-size:20px;color:var(--pk)">12.4K</div><div class="stat-delta delta-up">▲ +8.2%</div></div>
+            <div class="stat"><div class="stat-label">TikTok</div><div class="stat-value" style="font-size:20px;color:#2DD4BF">34.7K</div><div class="stat-delta delta-up">▲ +22.1%</div></div>
+            <div class="stat"><div class="stat-label">YouTube</div><div class="stat-value" style="font-size:20px;color:var(--rd)">8.1K</div><div class="stat-delta delta-up">▲ +5.4%</div></div>
+          </div>
+          <button class="btn-accent" onclick="toast('Plan IA généré pour 1 semaine !','success')">✦ Générer plan IA</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◇ Calendrier éditorial — cette semaine</span></div>
+          <div class="card-body">
+            <div class="cal-grid">
+              <div><div class="cal-day-label">LUN</div><div class="cal-slot ig">📸<br>IG Reel</div><div class="cal-slot empty">+</div></div>
+              <div><div class="cal-day-label">MAR</div><div class="cal-slot empty">+</div><div class="cal-slot tk">🎵<br>TikTok</div></div>
+              <div><div class="cal-day-label">MER</div><div class="cal-slot yt">▶️<br>YT Short</div><div class="cal-slot ig">📸<br>Story</div></div>
+              <div><div class="cal-day-label">JEU</div><div class="cal-slot empty">+</div><div class="cal-slot ig">📸<br>Post</div></div>
+              <div><div class="cal-day-label">VEN</div><div class="cal-slot tk">🎵<br>TikTok</div><div class="cal-slot yt">▶️<br>Vidéo</div></div>
+              <div><div class="cal-day-label">SAM</div><div class="cal-slot ig">📸<br>Live</div><div class="cal-slot empty">+</div></div>
+              <div><div class="cal-day-label">DIM</div><div class="cal-slot empty">+</div><div class="cal-slot tk">🎵<br>TikTok</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PLAYLISTING ── -->
+      <div id="page-playlisting" class="page animate-in">
+        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-label">Curateurs</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">8</div></div>
+          <div class="stat"><div class="stat-label">Pitchés</div><div class="stat-value" style="font-size:20px;color:var(--bl)">3</div></div>
+          <div class="stat"><div class="stat-label">Acceptés</div><div class="stat-value" style="font-size:20px;color:var(--am)">2</div></div>
+          <div class="stat"><div class="stat-label">Ajoutés</div><div class="stat-value" style="font-size:20px;color:var(--gn)">1</div></div>
+          <div class="stat"><div class="stat-label">Reach total</div><div class="stat-value" style="font-size:20px;color:var(--gn)">176K</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">♫ Curateurs détectés</span><button class="card-action" onclick="toast('Scan curateurs IA lancé !','success')">✦ Détecter →</button></div>
+          <div class="card-body" style="padding:6px 16px">
+            <div class="list-row"><div style="flex:1"><div class="row-name">House Gems Official</div><div class="row-sub">Spotify · 82 000 followers</div></div><span class="score score-hi" style="margin-right:8px">94%</span><span class="badge badge-gray" style="margin-right:8px">À pitcher</span><button class="ghost-btn" onclick="toast('Pitch généré et copié !','success')">✦ Pitcher</button></div>
+            <div class="list-row"><div style="flex:1"><div class="row-name">Late Night Electronic</div><div class="row-sub">Spotify · 45 000 followers</div></div><span class="score score-hi" style="margin-right:8px">88%</span><span class="badge badge-blue" style="margin-right:8px">Envoyé</span><button class="ghost-btn" onclick="toast('Relance envoyée !','success')">Relancer</button></div>
+            <div class="list-row"><div style="flex:1"><div class="row-name">Club Ready Selections</div><div class="row-sub">Apple Music · 31 000 followers</div></div><span class="score score-md" style="margin-right:8px">81%</span><span class="badge badge-green" style="margin-right:8px">Accepté ✓</span><button class="ghost-btn">Voir</button></div>
+            <div class="list-row"><div style="flex:1"><div class="row-name">Underground House Vibes</div><div class="row-sub">Spotify · 18 000 followers</div></div><span class="score score-md" style="margin-right:8px">76%</span><span class="badge badge-green" style="margin-right:8px">Ajouté 🎉</span><button class="ghost-btn">Voir</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRODUCTION ── -->
+      <div id="page-production" class="page animate-in">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:16px">
+            <div class="stat"><div class="stat-label">Idée</div><div class="stat-value" style="font-size:20px;color:var(--mu)">3</div></div>
+            <div class="stat"><div class="stat-label">Démo</div><div class="stat-value" style="font-size:20px;color:var(--bl)">2</div></div>
+            <div class="stat"><div class="stat-label">Mixage</div><div class="stat-value" style="font-size:20px;color:var(--ac)">1</div></div>
+            <div class="stat" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3)"><div class="stat-label">Mastering</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">1</div></div>
+            <div class="stat"><div class="stat-label">Sorti</div><div class="stat-value" style="font-size:20px;color:var(--gn)">12</div></div>
+          </div>
+          <button class="btn-accent" onclick="toast('Nouveau projet créé !','success')">+ Nouveau projet</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">▷ Projets en cours</span></div>
+          <div class="card-body">
+            <div class="prog-row">
+              <div class="prog-head"><span>🎵 Midnight Drive EP — Mixage</span><span>80%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:80%;background:var(--ac)"></div></div>
+            </div>
+            <div class="prog-row" style="margin-top:14px">
+              <div class="prog-head"><span>🎹 Neon Pulse (feat. LYRA) — Arrangement</span><span>45%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--pk)"></div></div>
+            </div>
+            <div class="prog-row" style="margin-top:14px">
+              <div class="prog-head"><span>💡 Club Edit Vol.3 — Démo</span><span>15%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:15%;background:var(--bl)"></div></div>
+            </div>
+            <div class="prog-row" style="margin-top:14px">
+              <div class="prog-head"><span>💿 Solar System — Mastering</span><span>92%</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:92%;background:var(--gn)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STUDIO IA ── -->
+      <div id="page-studio" class="page animate-in">
+        <div style="text-align:center;padding:20px 0 28px">
+          <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:16px;font-size:24px;margin-bottom:12px">✦</div>
+          <div style="font-size:20px;font-weight:700">Studio IA</div>
+          <div style="font-size:13px;color:var(--mu);margin-top:6px">Génère du contenu professionnel en quelques secondes</div>
+        </div>
+        <div class="grid-3">
+          <div class="card" style="cursor:pointer" onclick="showIAResult('email');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--ac)">✉</div>
+              <div style="font-weight:600;font-size:14px;color:var(--ac2);margin-bottom:6px">Email de pitch</div>
+              <div style="font-size:12px;color:var(--mu)">Radios, festivals, bookers, labels</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="showIAResult('bio');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(59,130,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--bl)">📝</div>
+              <div style="font-weight:600;font-size:14px;color:#60A5FA;margin-bottom:6px">Biographie</div>
+              <div style="font-size:12px;color:var(--mu)">Courte ou longue, FR ou EN</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="showIAResult('social');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(236,72,153,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--pk)">◇</div>
+              <div style="font-weight:600;font-size:14px;color:var(--pk);margin-bottom:6px">Plan social</div>
+              <div style="font-size:12px;color:var(--mu)">Calendrier 1 semaine complet</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="showIAResult('strategy');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(16,185,129,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--gn)">⬡</div>
+              <div style="font-weight:600;font-size:14px;color:var(--gn);margin-bottom:6px">Stratégie 3 mois</div>
+              <div style="font-size:12px;color:var(--mu)">Plan développement + KPIs</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="showIAResult('pitch');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(245,158,11,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--am)">♫</div>
+              <div style="font-weight:600;font-size:14px;color:var(--am);margin-bottom:6px">Pitch playlist</div>
+              <div style="font-size:12px;color:var(--mu)">Pour curateurs Spotify</div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="showIAResult('price');goPage('ia',null)" onmouseover="this.style.borderColor='rgba(16,185,129,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div class="card-body" style="text-align:center;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px;color:var(--gn)">💰</div>
+              <div style="font-weight:600;font-size:14px;color:var(--gn);margin-bottom:6px">Tarif cachet IA</div>
+              <div style="font-size:12px;color:var(--mu)">Estimation selon profil et event</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div id="page-analytics" class="page animate-in">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;gap:6px">
+          <button class="ghost-btn" style="background:var(--bg3)">7j</button>
+          <button class="ghost-btn" style="background:var(--bg3)">30j</button>
+          <button class="ghost-btn" style="background:var(--ac);border-color:var(--ac);color:#fff">3m</button>
+          <button class="ghost-btn" style="background:var(--bg3)">12m</button>
+        </div>
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat"><div class="stat-label">Streams totaux</div><div class="stat-value" style="color:var(--ac2)">284K</div><div class="stat-delta delta-up">▲ +12.4%</div><div class="stat-bar"><div class="stat-fill" style="width:68%;background:var(--ac)"></div></div></div>
+          <div class="stat"><div class="stat-label">Followers total</div><div class="stat-value" style="color:#60A5FA">55.2K</div><div class="stat-delta delta-up">▲ +6.8%</div><div class="stat-bar"><div class="stat-fill" style="width:55%;background:var(--bl)"></div></div></div>
+          <div class="stat"><div class="stat-label">Taux engagement</div><div class="stat-value" style="color:var(--gn)">4.7%</div><div class="stat-delta delta-up">▲ +0.9pts</div><div class="stat-bar"><div class="stat-fill" style="width:47%;background:var(--gn)"></div></div></div>
+          <div class="stat"><div class="stat-label">Score popularité</div><div class="stat-value" style="color:var(--am)">73/100</div><div class="stat-delta delta-up">Spotify Artist</div><div class="stat-bar"><div class="stat-fill" style="width:73%;background:var(--am)"></div></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Top tracks</span></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row"><span style="color:var(--mu);width:20px;font-size:12px">1</span><div style="flex:1"><div class="row-name">Midnight Drive</div></div><span style="color:var(--mu);font-size:12px">84.2K</span><span class="badge badge-green" style="margin-left:8px">+18%</span></div>
+              <div class="list-row"><span style="color:var(--mu);width:20px;font-size:12px">2</span><div style="flex:1"><div class="row-name">Neon Pulse</div></div><span style="color:var(--mu);font-size:12px">51.4K</span><span class="badge badge-green" style="margin-left:8px">+31%</span></div>
+              <div class="list-row"><span style="color:var(--mu);width:20px;font-size:12px">3</span><div style="flex:1"><div class="row-name">Solar System</div></div><span style="color:var(--mu);font-size:12px">38.7K</span><span class="badge badge-green" style="margin-left:8px">+9%</span></div>
+              <div class="list-row"><span style="color:var(--mu);width:20px;font-size:12px">4</span><div style="flex:1"><div class="row-name">Club Edit Vol.2</div></div><span style="color:var(--mu);font-size:12px">29.3K</span><span class="badge badge-green" style="margin-left:8px">+5%</span></div>
+              <div class="list-row"><span style="color:var(--mu);width:20px;font-size:12px">5</span><div style="flex:1"><div class="row-name">Retrograde</div></div><span style="color:var(--mu);font-size:12px">17.8K</span><span class="badge badge-green" style="margin-left:8px">+44%</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Top pays</span></div>
+            <div class="card-body">
+              <div class="prog-row"><div class="prog-head"><span>🇫🇷 France</span><span>38%</span></div><div class="prog-bar"><div class="prog-fill" style="width:38%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇧🇪 Belgique</span><span>14%</span></div><div class="prog-bar"><div class="prog-fill" style="width:14%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇩🇪 Allemagne</span><span>11%</span></div><div class="prog-bar"><div class="prog-fill" style="width:11%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇬🇧 UK</span><span>9%</span></div><div class="prog-bar"><div class="prog-fill" style="width:9%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇳🇱 Pays-Bas</span><span>7%</span></div><div class="prog-bar"><div class="prog-fill" style="width:7%;background:var(--ac)"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DOCUMENTS ── -->
+      <div id="page-documents" class="page animate-in">
+        <div class="grid-2">
+          <div class="card" style="cursor:pointer" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="toast('Biographie ouverte en édition','success')">
+            <div class="card-body">
+              <div style="font-size:30px;margin-bottom:10px">📝</div>
+              <div style="font-weight:600;font-size:14px;color:var(--ac2);margin-bottom:4px">Biographie artiste</div>
+              <div style="font-size:12px;color:var(--mu);margin-bottom:12px">FR / EN · Mis à jour 12/04</div>
+              <div style="display:flex;gap:8px"><button class="ghost-btn" onclick="event.stopPropagation()">Éditer</button><button class="ghost-btn" onclick="event.stopPropagation();toast('PDF téléchargé !','success')">↓ PDF</button><button class="ghost-btn" onclick="event.stopPropagation();toast('Bio générée par IA !','success')">✦ IA</button></div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onmouseover="this.style.borderColor='rgba(59,130,246,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="toast('Press Kit ouvert','success')">
+            <div class="card-body">
+              <div style="font-size:30px;margin-bottom:10px">📦</div>
+              <div style="font-weight:600;font-size:14px;color:#60A5FA;margin-bottom:4px">Press Kit</div>
+              <div style="font-size:12px;color:var(--mu);margin-bottom:12px">PDF · 4.2 MB · 2026</div>
+              <div style="display:flex;gap:8px"><button class="ghost-btn" onclick="event.stopPropagation()">Éditer</button><button class="ghost-btn" onclick="event.stopPropagation();toast('Press Kit téléchargé !','success')">↓ PDF</button></div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onmouseover="this.style.borderColor='rgba(245,158,11,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="toast('Rider technique ouvert','success')">
+            <div class="card-body">
+              <div style="font-size:30px;margin-bottom:10px">🎚️</div>
+              <div style="font-weight:600;font-size:14px;color:var(--am);margin-bottom:4px">Rider technique</div>
+              <div style="font-size:12px;color:var(--mu);margin-bottom:12px">Son · Lumières · Scène</div>
+              <div style="display:flex;gap:8px"><button class="ghost-btn" onclick="event.stopPropagation()">Éditer</button><button class="ghost-btn" onclick="event.stopPropagation();toast('Rider téléchargé !','success')">↓ PDF</button></div>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onmouseover="this.style.borderColor='rgba(16,185,129,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="toast('Stage Plot ouvert','success')">
+            <div class="card-body">
+              <div style="font-size:30px;margin-bottom:10px">🎭</div>
+              <div style="font-weight:600;font-size:14px;color:var(--gn);margin-bottom:4px">Stage Plot</div>
+              <div style="font-size:12px;color:var(--mu);margin-bottom:12px">PDF illustré</div>
+              <div style="display:flex;gap:8px"><button class="ghost-btn" onclick="event.stopPropagation()">Éditer</button><button class="ghost-btn" onclick="event.stopPropagation();toast('Stage Plot téléchargé !','success')">↓ PDF</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div id="page-settings" class="page animate-in">
+        <div style="max-width:600px">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><span class="card-title">👤 Informations du compte</span></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">Nom complet</label><input class="form-input" value="Iyani Saganoko"></div>
+                <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" value="demo@sloomio.com"></div>
+              </div>
+              <div class="form-field"><label class="form-label">Plan actuel</label><div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span class="badge badge-purple" style="font-size:12px;padding:4px 12px">PRO</span><span style="font-size:12px;color:var(--mu)">· Actif · Renouvellement le 01/06/2026</span></div></div>
+              <button class="btn-accent" onclick="toast('Profil mis à jour !','success')">Sauvegarder</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><span class="card-title">💳 Abonnement</span></div>
+            <div class="card-body">
+              <div class="grid-3" style="margin-bottom:14px">
+                <div style="border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:4px">Starter</div>
+                  <div style="color:var(--ac2);font-weight:700;font-size:16px;margin-bottom:8px">€0</div>
+                  <div style="font-size:11px;color:var(--mu)">1 artiste · CRM basique</div>
+                </div>
+                <div style="border:2px solid var(--ac);border-radius:10px;padding:14px;text-align:center;background:rgba(139,92,246,.05)">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--ac2)">Pro ✓</div>
+                  <div style="color:var(--ac2);font-weight:700;font-size:16px;margin-bottom:8px">€29/mois</div>
+                  <div style="font-size:11px;color:var(--mu)">Multi-profils · IA avancée</div>
+                </div>
+                <div style="border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:4px">Label</div>
+                  <div style="color:var(--pk);font-weight:700;font-size:16px;margin-bottom:8px">€79/mois</div>
+                  <div style="font-size:11px;color:var(--mu)">Équipe · Import CSV massif</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="ghost-btn" onclick="toast('Abonnement mis en pause','success')">⏸ Mettre en pause</button>
+                <button class="ghost-btn" style="color:var(--rd);border-color:rgba(239,68,68,.3)" onclick="toast('Contactez le support pour annuler','error')">Annuler</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">🔐 Sécurité</span></div>
+            <div class="card-body">
+              <div class="form-field"><label class="form-label">Mot de passe actuel</label><input class="form-input" type="password" placeholder="••••••••"></div>
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">Nouveau mot de passe</label><input class="form-input" type="password" placeholder="Min. 8 caractères"></div>
+                <div class="form-field"><label class="form-label">Confirmer</label><input class="form-input" type="password" placeholder="••••••••"></div>
+              </div>
+              <button class="btn-accent" onclick="toast('Mot de passe mis à jour !','success')">Mettre à jour</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODALS
+════════════════════════════════════════ -->
+<div id="modal-contact" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-contact')">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">+ Nouveau contact</span><button class="modal-close" onclick="closeModal('modal-contact')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Prénom</label><input class="form-input" placeholder="Jean"></div>
+        <div class="form-field"><label class="form-label">Nom</label><input class="form-input" placeholder="Dupont"></div>
+      </div>
+      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="jean@radio.fr"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Entreprise</label><input class="form-input" placeholder="Radio FG"></div>
+        <div class="form-field"><label class="form-label">Rôle</label><input class="form-input" placeholder="Directeur programme"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Type</label><select class="form-select"><option>Radio</option><option>Festival</option><option>Club</option><option>Label</option><option>Curateur</option><option>Booker</option></select></div>
+        <div class="form-field"><label class="form-label">Pays</label><input class="form-input" placeholder="France"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('modal-contact')">Annuler</button><button class="btn-accent" onclick="closeModal('modal-contact');toast('Contact ajouté !','success')">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modal-booking" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-booking')">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">+ Nouveau booking</span><button class="modal-close" onclick="closeModal('modal-booking')">×</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Lieu / Venue</label><input class="form-input" placeholder="Club Rex, Paris"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Ville</label><input class="form-input" placeholder="Paris"></div>
+        <div class="form-field"><label class="form-label">Pays</label><input class="form-input" placeholder="France"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Type</label><select class="form-select"><option>Club</option><option>Festival</option><option>Privé</option><option>Showcase</option><option>Radio</option></select></div>
+        <div class="form-field"><label class="form-label">Date</label><input class="form-input" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Cachet (€)</label><input class="form-input" type="number" placeholder="800"></div>
+        <div class="form-field"><label class="form-label">Statut</label><select class="form-select"><option>Prospect</option><option>Contacté</option><option>Négociation</option><option>Confirmé</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('modal-booking')">Annuler</button><button class="btn-accent" onclick="closeModal('modal-booking');toast('Booking ajouté !','success')">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modal-finance" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-finance')">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">+ Nouvelle transaction</span><button class="modal-close" onclick="closeModal('modal-finance')">×</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <button id="fin-income" style="padding:10px;background:rgba(16,185,129,.15);border:2px solid var(--gn);border-radius:8px;color:var(--gn);font-weight:600;cursor:pointer" onclick="selectFinType('income')">+ Revenu</button>
+        <button id="fin-expense" style="padding:10px;background:transparent;border:1px solid var(--bd2);border-radius:8px;color:var(--mu);cursor:pointer" onclick="selectFinType('expense')">- Dépense</button>
+      </div>
+      <div class="form-field"><label class="form-label">Description</label><input class="form-input" placeholder="Cachet Club XYZ"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Montant (€)</label><input class="form-input" type="number" placeholder="800"></div>
+        <div class="form-field"><label class="form-label">Date</label><input class="form-input" type="date"></div>
+      </div>
+      <div class="form-field"><label class="form-label">Catégorie</label><select class="form-select"><option>Live / Cachet</option><option>Streaming</option><option>Sync / Licence</option><option>Studio</option><option>Marketing</option><option>Transport</option><option>Autre</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('modal-finance')">Annuler</button><button class="btn-accent" onclick="closeModal('modal-finance');toast('Transaction enregistrée !','success')">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modal-candidature" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-candidature')">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">🎪 Candidature — Nuits Électriques</span><button class="modal-close" onclick="closeModal('modal-candidature')">×</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px">
+        <strong style="color:var(--gn)">Deadline : J-12</strong> · Festival · Belgique · 8 000 personnes · Electronic
+      </div>
+      <div class="form-field"><label class="form-label">Message de présentation</label><textarea class="form-input" rows="4" style="resize:none" placeholder="Décris ton projet artistique...">DJ Kael est un artiste électronique / house basé à Paris. Avec 284K streams mensuels et un style unique alliant deep house et électronique progressive, il se produit dans les clubs et festivals européens depuis 2020...</textarea></div>
+      <div class="form-field"><label class="form-label">Lien de démo</label><input class="form-input" placeholder="https://soundcloud.com/..." value="https://soundcloud.com/djkael/midnight-drive"></div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('modal-candidature')">Annuler</button><button class="btn-accent" onclick="closeModal('modal-candidature');toast('Candidature envoyée ! ✓','success')">Envoyer la candidature</button></div>
+  </div>
+</div>
+
+<script>
+var APP = {
+  user: null,
+  artist: null,
+  genres: []
+};
+
+var IA_TEXTS = {
+  email: `Objet : Proposition de collaboration — DJ Kael
+
+Bonjour Marc,
+
+Je me permets de vous contacter concernant une possible diffusion des tracks de DJ Kael sur Radio FG.
+
+DJ Kael est un artiste électronique / house basé à Paris, fort de 284 000 streams mensuels et d'une présence scénique régulière dans les clubs européens. Son EP "Midnight Drive" (2026) a été bien reçu par la communauté house française.
+
+Je serais ravi de vous faire parvenir un pack de tracks en exclusivité pour vos grilles de nuit.
+
+Bien cordialement,
+DJ Kael`,
+  bio: `DJ Kael est un artiste électronique français dont le son navigue entre deep house et electronic progressive. Basé à Paris, il puise son inspiration dans les clubs berlinois et la scène house parisienne pour créer une musique à la fois dansante et émotionnelle.
+
+Avec plus de 284 000 streams mensuels sur Spotify et des passages dans les clubs emblématiques de Paris, Londres et Berlin, DJ Kael s'impose comme l'une des voix les plus prometteuses de la scène électronique francophone.
+
+Son EP "Midnight Drive" (2026) illustre parfaitement son univers : des productions profondes, des lignes de basse hypnotiques et une énergie de dancefloor irrésistible.`,
+  social: `Plan éditorial — Semaine du 19 au 25 Mai 2026
+
+LUNDI — Instagram Reel (21h)
+"Behind the scenes : session studio Midnight Drive 🎹"
+#HouseMusic #BehindTheScenes #StudioLife
+
+MARDI — TikTok (19h)
+"Le drop qu'on attendait 🔥 #NeonPulse preview"
+Trend musical avec extrait exclusif
+
+MERCREDI — YouTube Short (18h) + Instagram Story (20h)
+Short : Making of en 60 secondes
+Story : Vote pour la prochaine date
+
+VENDREDI — TikTok (21h)
+"POV: tu arrives au Rex Club Paris ce soir"
+Ambiance soirée, look, préparation
+
+SAMEDI — Instagram Live (22h)
+Live set exclusif 1h depuis le studio`,
+  strategy: `STRATÉGIE DÉVELOPPEMENT — DJ Kael
+Période : Juin → Août 2026
+
+MOIS 1 — Fondations
+• Pitcher 50 radios européennes (Radio FG, NTS, Rinse)
+• Connecter 20 curateurs Spotify house/electronic
+• Publier 3 contenus/semaine sur IG + TikTok
+• Sortir "Neon Pulse" feat. LYRA
+KPI : +5 000 followers · 15 réponses radios
+
+MOIS 2 — Accélération
+• Confirmer 4 dates live (clubs + festivals)
+• Lancer campagne playlist push
+• Collaborer avec 2 artistes pour remixes
+• Préparer candidatures festivals automne
+KPI : +10 000 streams/semaine · 2 dates confirmées
+
+MOIS 3 — Consolidation
+• Sortir "Midnight Drive EP" (4 tracks)
+• Tournée mini-europe (5 villes)
+• Press kit v2 + interview presse spécialisée
+• Bilan ROI et ajustements stratégiques
+KPI : 400K streams totaux · 3 festivals confirmés`,
+  pitch: `Bonjour,
+
+Je me permets de vous contacter au sujet de votre excellente playlist "House Gems Official".
+
+Je suis DJ Kael, artiste house/electronic basé à Paris. Mon dernier titre "Midnight Drive" (BPM 128, Key Am) s'inscrit parfaitement dans la ligne éditoriale de votre sélection — deep house progressive avec des influences berlinoises.
+
+Le titre cumule 84 000 streams en 3 semaines et a été sélectionné par NTS Radio France.
+
+Lien d'écoute : soundcloud.com/djkael/midnight-drive
+
+Merci de votre attention,
+DJ Kael`,
+  price: `ESTIMATION TARIF CACHET — DJ Kael
+Type d'événement : Club / 500 personnes
+
+Fourchette recommandée :
+• Minimum    : € 500
+• Recommandé : € 800  ← à proposer en premier
+• Maximum    : € 1 200
+
+Justification :
+Avec 284K streams mensuels, une présence régulière en club et un EP récent bien reçu, DJ Kael se situe dans la catégorie "artiste émergent confirmé". La fourchette de €800 est cohérente avec le marché club parisien pour ce profil.
+
+Conseil : demandez toujours €1 000, acceptez à €700 minimum.`
+};
+
+function showScreen(name){
+  document.querySelectorAll('[id^="screen-"]').forEach(el=>el.style.display='none');
+  var el=document.getElementById('screen-'+name);
+  if(el)el.style.display='flex';
+}
+
+function doLogin(){
+  var email=document.getElementById('login-email').value;
+  var pass=document.getElementById('login-pass').value;
+  var err=document.getElementById('login-error');
+  if((email==='demo@sloomio.com' && pass==='demo1234')||(email&&pass.length>=6)){
+    err.style.display='none';
+    APP.user={name:'Iyani Saganoko',email:email};
+    APP.artist={name:'DJ Kael',genre:'Electronic · House'};
+    document.getElementById('sb-initials').textContent='DJ';
+    document.getElementById('sb-artist-name').textContent='DJ Kael';
+    document.getElementById('sb-artist-genre').textContent='Electronic · House';
+    document.getElementById('banner-name').textContent='DJ Kael';
+    showScreen('app');
+    toast('Bienvenue sur SLOOMIO ! 🎵','success');
+  } else {
+    err.style.display='block';
+  }
+}
+
+function doRegister(){
+  var name=document.getElementById('reg-name').value;
+  var email=document.getElementById('reg-email').value;
+  var pass=document.getElementById('reg-pass').value;
+  var confirm=document.getElementById('reg-confirm').value;
+  if(!name||!email||!pass){toast('Remplis tous les champs','error');return}
+  if(pass!==confirm){toast('Les mots de passe ne correspondent pas','error');return}
+  if(pass.length<8){toast('Mot de passe trop court (min. 8 caractères)','error');return}
+  APP.user={name:name,email:email};
+  showScreen('onboard');
+}
+
+function onboardNext(){
+  var name=document.getElementById('ob-name').value;
+  if(!name){toast("Entre ton nom d'artiste",'error');return}
+  APP.artist={name:name,country:document.getElementById('ob-country').value,bio:document.getElementById('ob-bio').value};
+  document.getElementById('onboard-p1').style.display='none';
+  document.getElementById('onboard-p2').style.display='block';
+  document.getElementById('ostep2').classList.add('done');
+  document.getElementById('onboard-step-label').textContent='Étape 2 sur 2';
+}
+
+function onboardBack(){
+  document.getElementById('onboard-p2').style.display='none';
+  document.getElementById('onboard-p1').style.display='block';
+  document.getElementById('ostep2').classList.remove('done');
+  document.getElementById('onboard-step-label').textContent='Étape 1 sur 2';
+}
+
+function toggleGenre(el){el.classList.toggle('selected');var g=el.textContent;var i=APP.genres.indexOf(g);if(i>-1)APP.genres.splice(i,1);else APP.genres.push(g)}
+
+function onboardFinish(){
+  if(APP.genres.length===0){toast('Choisis au moins un genre','error');return}
+  var initials=APP.artist.name.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2);
+  document.getElementById('sb-initials').textContent=initials;
+  document.getElementById('sb-artist-name').textContent=APP.artist.name;
+  document.getElementById('sb-artist-genre').textContent=APP.genres.slice(0,2).join(' · ');
+  document.getElementById('banner-name').textContent=APP.artist.name;
+  showScreen('app');
+  toast('Bienvenue sur SLOOMIO ! 🚀','success');
+}
+
+function goPage(id,navEl){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  var page=document.getElementById('page-'+id);
+  if(page)page.classList.add('active');
+  if(navEl)navEl.classList.add('active');
+  var titles={dashboard:'Vue globale',ia:'✦ IA Manager',radar:'◎ Radar',crm:'◈ CRM',social:'◇ Réseaux sociaux',playlisting:'♫ Playlisting',booking:'◆ Booking & Live',finance:'◑ Finance',documents:'▣ Documents',production:'▷ Production',studio:'✦ Studio IA',analytics:'◭ Analytics',settings:'⚙ Paramètres'};
+  document.getElementById('page-title').textContent=titles[id]||'SLOOMIO';
+  document.querySelector('.content').scrollTop=0;
+}
+
+function showIAResult(type){
+  document.getElementById('ia-result').style.display='block';
+  document.getElementById('ia-result-text').textContent=IA_TEXTS[type]||'Résultat généré par l\'IA...';
+  document.getElementById('ia-result').scrollIntoView({behavior:'smooth'});
+}
+
+function copyIAResult(){
+  var text=document.getElementById('ia-result-text').textContent;
+  navigator.clipboard.writeText(text).then(function(){toast('Copié dans le presse-papier !','success')}).catch(function(){toast('Sélectionne et copie manuellement','error')});
+}
+
+function openModal(id){document.getElementById(id).style.display='flex'}
+function closeModal(id){document.getElementById(id).style.display='none'}
+
+function selectFinType(type){
+  var i=document.getElementById('fin-income');
+  var e=document.getElementById('fin-expense');
+  if(type==='income'){i.style.background='rgba(16,185,129,.15)';i.style.border='2px solid var(--gn)';i.style.color='var(--gn)';e.style.background='transparent';e.style.border='1px solid var(--bd2)';e.style.color='var(--mu)'}
+  else{e.style.background='rgba(239,68,68,.15)';e.style.border='2px solid var(--rd)';e.style.color='var(--rd)';i.style.background='transparent';i.style.border='1px solid var(--bd2)';i.style.color='var(--mu)'}
+}
+
+function doLogout(){
+  APP.user=null;APP.artist=null;APP.genres=[];
+  showScreen('login');
+  toast('Déconnecté avec succès','success');
+}
+
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+(type||'');
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},3000);
+}
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.modal-overlay').forEach(function(m){m.style.display='none'})}});
+</script>
+</body>
+</html>
