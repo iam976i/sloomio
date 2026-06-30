@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLOOMIO — Yan Hill</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0C;--bg2:#111115;--bg3:#18181F;--bg4:#1E1E26;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);
+  --tx:#F0EEF8;--mu:#7A788A;
+  --ac:#8B5CF6;--ac2:#A78BFA;
+  --gn:#10B981;--am:#F59E0B;--rd:#EF4444;--bl:#3B82F6;--pk:#EC4899;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+input,button,select,textarea{font-family:inherit}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+.auth-glow{position:fixed;top:25%;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none}
+.auth-box{width:100%;max-width:380px;position:relative}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-icon{width:52px;height:52px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+.auth-title{font-size:24px;font-weight:700}
+.auth-sub{font-size:13px;color:var(--mu);margin-top:4px}
+.auth-card{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;padding:28px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:6px}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;color:var(--tx);font-size:14px;outline:none;transition:border .15s}
+.field input:focus{border-color:var(--ac)}
+.btn-primary{width:100%;padding:12px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:#7C3AED}
+.auth-link{text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);font-size:13px;color:var(--mu)}
+.auth-link a{color:var(--ac2);text-decoration:none;font-weight:500}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--tx);z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,.4);color:#6EE7B7}
+.toast.error{border-color:rgba(239,68,68,.4);color:#FCA5A5}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:18px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb-logo-name{font-weight:700;font-size:14px}
+.sb-logo-plan{font-size:9px;color:var(--ac2);font-weight:600;margin-top:1px}
+.sb-artist{margin:10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:9px}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#EC4899);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+nav{flex:1;padding:6px}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);padding:8px 8px 3px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--mu);font-size:12px;transition:all .12s;margin-bottom:1px}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.nav-item.active{background:rgba(139,92,246,.15);color:var(--ac2);font-weight:600}
+.nav-icon{font-size:13px;width:15px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--ac);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px}
+.nav-badge.g{background:var(--gn)}.nav-badge.a{background:var(--am);color:#1a0}
+.sb-footer{border-top:1px solid var(--bd);padding:12px}
+.plan-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:12px}
+.plan-btn{width:100%;padding:7px;background:var(--ac);border:none;border-radius:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px}
+.logout-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--mu);font-size:12px;cursor:pointer;background:none;border:none;margin-top:8px;transition:all .12s}
+.logout-btn:hover{background:rgba(239,68,68,.08);color:var(--rd)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:14px;padding:0 22px;background:rgba(10,10,12,.8);flex-shrink:0}
+.topbar-title{font-weight:700;font-size:16px;flex:1}
+.topbar-search{position:relative}
+.topbar-search input{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:6px 12px 6px 30px;color:var(--tx);font-size:12px;width:180px;outline:none}
+.topbar-si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:13px;pointer-events:none}
+.ia-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:8px;color:var(--ac2);font-size:12px;font-weight:600;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:20px}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-weight:600;font-size:13px}
+.card-action{font-size:11px;color:var(--ac2);cursor:pointer;background:none;border:none}
+.card-body{padding:14px 16px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px}
+.stat-value{font-size:22px;font-weight:700;margin-bottom:4px}
+.stat-delta{font-size:11px}
+.delta-up{color:var(--gn)}
+.stat-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:10px}
+.stat-fill{height:100%;border-radius:2px}
+.ai-banner{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(236,72,153,.05));border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:16px 18px;display:flex;gap:14px;margin-bottom:18px}
+.ai-avatar{width:40px;height:40px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ai-content{flex:1}
+.ai-label{font-size:9px;color:var(--ac2);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+.ai-msg{font-size:13px;line-height:1.5;margin-bottom:10px}
+.ai-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ai-action-btn{padding:5px 12px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:6px;color:var(--ac2);font-size:11px;cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-7-5{display:grid;grid-template-columns:7fr 5fr;gap:14px}
+.os-table{width:100%;border-collapse:collapse;font-size:13px}
+.os-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);padding:8px 12px;text-align:left;border-bottom:1px solid var(--bd)}
+.os-table td{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.os-table tr:last-child td{border-bottom:none}
+.os-table tbody tr:hover{background:var(--bg3);cursor:pointer}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-purple{background:rgba(139,92,246,.15);color:var(--ac2);border:1px solid rgba(139,92,246,.25)}
+.badge-green{background:rgba(16,185,129,.15);color:var(--gn);border:1px solid rgba(16,185,129,.25)}
+.badge-amber{background:rgba(245,158,11,.15);color:var(--am);border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
+.badge-blue{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.25)}
+.badge-pink{background:rgba(236,72,153,.15);color:var(--pk);border:1px solid rgba(236,72,153,.25)}
+.badge-gray{background:var(--bg3);color:var(--mu);border:1px solid var(--bd)}
+.list-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.list-row:last-child{border:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.row-name{font-size:12px;font-weight:600}
+.row-sub{font-size:10px;color:var(--mu)}
+.score{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.score-hi{background:rgba(16,185,129,.15);color:var(--gn)}
+.score-md{background:rgba(245,158,11,.15);color:var(--am)}
+.score-lo{background:rgba(139,92,246,.15);color:var(--ac2)}
+.ghost-btn{padding:4px 10px;background:transparent;border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:10px;cursor:pointer;transition:all .12s}
+.ghost-btn:hover{border-color:var(--ac2);color:var(--ac2)}
+.prog-row{margin-bottom:10px}
+.prog-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;color:var(--mu)}
+.prog-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:500px;animation:slideUp .25s ease}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-weight:700;font-size:15px}
+.modal-close{background:none;border:none;color:var(--mu);font-size:20px;cursor:pointer}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end}
+.form-field{margin-bottom:12px}
+.form-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:5px}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none;transition:border .15s}
+.form-input:focus{border-color:var(--ac)}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none}
+.btn-secondary{padding:8px 18px;background:transparent;border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:13px;cursor:pointer}
+.btn-accent{padding:8px 18px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.fin-row:last-child{border:none}
+.fin-pos{color:var(--gn);font-weight:600}
+.fin-neg{color:var(--rd);font-weight:600}
+/* SPIDER NETWORK */
+#spider-canvas{width:100%;height:500px;border-radius:12px;background:var(--bg2);border:1px solid var(--bd);cursor:grab}
+#spider-canvas:active{cursor:grabbing}
+.spider-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.spider-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu)}
+.spider-leg-dot{width:10px;height:10px;border-radius:50%}
+.spider-tooltip{position:fixed;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:100;display:none;max-width:220px}
+/* SOCIAL */
+.platform-card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px}
+.platform-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.platform-name{font-weight:600;font-size:14px}
+.platform-handle{font-size:11px;color:var(--mu);margin-bottom:4px}
+.platform-stat{font-size:18px;font-weight:700}
+.platform-delta{font-size:11px;color:var(--gn)}
+/* MAILING */
+.template-card{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border .12s}
+.template-card:hover{border-color:var(--ac2)}
+.template-card.selected{border-color:var(--ac);background:rgba(139,92,246,.08)}
+/* PIPE */
+.pipe-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pipe-col-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px}
+.pipe-card{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:7px;cursor:pointer}
+.pipe-card:hover{border-color:var(--bd2)}
+.pipe-venue{font-size:12px;font-weight:600;margin-bottom:3px}
+.pipe-detail{font-size:10px;color:var(--mu);margin-bottom:4px}
+.pipe-fee{font-size:12px;font-weight:700;color:var(--gn)}
+.pipe-add{border:1px dashed var(--bd2);border-radius:8px;padding:8px;text-align:center;font-size:11px;color:var(--mu);cursor:pointer}
+.pipe-add:hover{border-color:var(--ac2);color:var(--ac2)}
+/* ONBOARD */
+.onboard-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.onboard-progress{display:flex;gap:8px;margin-bottom:28px}
+.onboard-step{height:4px;flex:1;border-radius:2px;background:var(--bg3);transition:background .3s}
+.onboard-step.done{background:var(--ac)}
+.genre-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.genre-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--bd2);color:var(--mu);font-size:12px;cursor:pointer;transition:all .15s}
+.genre-chip.selected{background:var(--ac);border-color:var(--ac);color:#fff}
+/* NETWORK LINKS */
+.network-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.net-link{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:12px;text-decoration:none;transition:all .12s}
+.net-link:hover{border-color:var(--ac2);color:var(--ac2)}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="spider-tooltip" id="spider-tooltip"></div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="auth-wrap">
+  <div class="auth-glow"></div>
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">SLOOMIO</div>
+      <div class="auth-sub">We Weave Careers.</div>
+    </div>
+    <div class="auth-card">
+      <div class="field"><label>Email</label><input type="email" id="login-email" value="yanhill.backhit@gmail.com"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="login-pass" value="yanhill2026"></div>
+      <button class="btn-primary" onclick="doLogin()">Se connecter</button>
+      <div class="auth-link">Pas encore de compte ? <a href="#" onclick="showScreen('register')">Créer un compte</a></div>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--mu);margin-top:12px">Démo : yanhill.backhit@gmail.com / yanhill2026</p>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="screen-register" class="auth-wrap" style="display:none">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">SLOOMIO</div>
+      <div class="auth-sub">Crée ton compte gratuit</div>
+    </div>
+    <div class="auth-card">
+      <div class="field"><label>Nom complet</label><input type="text" id="reg-name" placeholder="Yan Hill"></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="yanhill.backhit@gmail.com"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="reg-pass" placeholder="Min. 8 caractères"></div>
+      <div class="field"><label>Confirmer</label><input type="password" id="reg-confirm" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doRegister()">Créer mon compte</button>
+      <div class="auth-link">Déjà inscrit ? <a href="#" onclick="showScreen('login')">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="screen-onboard" class="onboard-wrap" style="display:none">
+  <div style="width:100%;max-width:520px">
+    <div class="auth-logo">
+      <div class="auth-icon">🎵</div>
+      <div class="auth-title">Configurons ton profil</div>
+      <div class="auth-sub" id="ob-step-label">Étape 1 sur 2</div>
+    </div>
+    <div class="onboard-progress"><div class="onboard-step done"></div><div class="onboard-step" id="ostep2"></div></div>
+    <div id="ob-p1">
+      <div class="auth-card">
+        <div class="field"><label>Nom d'artiste</label><input type="text" id="ob-name" placeholder="Yan Hill"></div>
+        <div class="field"><label>Ville / Pays</label><input type="text" id="ob-city" placeholder="St Mammes, France"></div>
+        <div class="field"><label>Bio courte</label><textarea class="form-input" id="ob-bio" rows="2" placeholder="Artiste indépendant..." style="resize:none"></textarea></div>
+        <button class="btn-primary" onclick="obNext()">Continuer →</button>
+      </div>
+    </div>
+    <div id="ob-p2" style="display:none">
+      <div class="auth-card">
+        <div class="field">
+          <label>Genres musicaux</label>
+          <div class="genre-grid" id="genre-grid">
+            <div class="genre-chip" onclick="toggleGenre(this)">Pop</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Rock</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Electronic</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">House</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Hip-Hop</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">R&B</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Soul</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Jazz</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Reggae</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Afrobeat</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Chanson française</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Indie</div>
+            <div class="genre-chip" onclick="toggleGenre(this)">Autre</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn-secondary" style="flex:1" onclick="obBack()">← Retour</button>
+          <button class="btn-primary" style="flex:2" onclick="obFinish()">🚀 Lancer SLOOMIO</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="app" style="display:none">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🎵</div>
+      <div><div class="sb-logo-name">SLOOMIO</div><div class="sb-logo-plan">● PRO</div></div>
+    </div>
+    <div class="sb-artist">
+      <div class="sb-av" id="sb-av">YH</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--tx)" id="sb-name">Yan Hill</div><div style="font-size:9px;color:var(--mu)" id="sb-genre">Artiste · St Mammes</div></div>
+    </div>
+    <nav>
+      <div class="nav-label">Dashboard</div>
+      <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">⬡</span> Vue globale</div>
+      <div class="nav-item" onclick="goPage('ia',this)"><span class="nav-icon">✦</span> IA Manager <span class="nav-badge">5</span></div>
+      <div class="nav-label">Réseau</div>
+      <div class="nav-item" onclick="goPage('spider',this)"><span class="nav-icon">🕸️</span> Spider Network</div>
+      <div class="nav-item" onclick="goPage('crm',this)"><span class="nav-icon">◈</span> CRM Contacts</div>
+      <div class="nav-item" onclick="goPage('mailing',this)"><span class="nav-icon">✉</span> Mailing <span class="nav-badge a">3</span></div>
+      <div class="nav-label">Croissance</div>
+      <div class="nav-item" onclick="goPage('radar',this)"><span class="nav-icon">◎</span> Radar <span class="nav-badge g">18</span></div>
+      <div class="nav-item" onclick="goPage('social',this)"><span class="nav-icon">◇</span> Réseaux sociaux</div>
+      <div class="nav-item" onclick="goPage('playlisting',this)"><span class="nav-icon">♫</span> Playlisting</div>
+      <div class="nav-label">Business</div>
+      <div class="nav-item" onclick="goPage('booking',this)"><span class="nav-icon">◆</span> Booking & Live</div>
+      <div class="nav-item" onclick="goPage('finance',this)"><span class="nav-icon">◑</span> Finance</div>
+      <div class="nav-label">Création</div>
+      <div class="nav-item" onclick="goPage('production',this)"><span class="nav-icon">▷</span> Production</div>
+      <div class="nav-item" onclick="goPage('analytics',this)"><span class="nav-icon">◭</span> Analytics</div>
+      <div class="nav-label">Compte</div>
+      <div class="nav-item" onclick="goPage('settings',this)"><span class="nav-icon">⚙</span> Paramètres</div>
+    </nav>
+    <div class="sb-footer">
+      <div class="plan-box">
+        <div style="font-size:10px;color:var(--ac2);font-weight:700;margin-bottom:3px">✦ Plan PRO actif</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:0">Spider Network · Mailing · IA</div>
+        <button class="plan-btn">Passer Label ↗</button>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">⏻ Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Vue globale</div>
+      <div class="topbar-search">
+        <span class="topbar-si">⌕</span>
+        <input type="text" placeholder="Rechercher...">
+      </div>
+      <button class="ia-btn" onclick="goPage('ia',null)">✦ IA Manager</button>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="ai-banner">
+          <div class="ai-avatar">✦</div>
+          <div class="ai-content">
+            <div class="ai-label">IA MANAGER · Yan Hill</div>
+            <div class="ai-msg">Bonjour <strong>Yan Hill</strong> ! Ton profil iMusician est actif. J'ai détecté <strong>18 opportunités</strong> dans le Radar (radios, salles, festivals) et <strong>3 campagnes mailing</strong> prêtes à envoyer. Ton Spider Network compte <strong>47 connexions actives</strong>.</div>
+            <div class="ai-actions">
+              <button class="ai-action-btn" onclick="goPage('spider',null)">🕸️ Spider Network</button>
+              <button class="ai-action-btn" onclick="goPage('mailing',null)">✉ Campagnes mailing</button>
+              <button class="ai-action-btn" onclick="goPage('radar',null)">◎ Voir opportunités</button>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-label">Contacts réseau</div><div class="stat-value" style="color:var(--ac2)">47</div><div class="stat-delta delta-up">▲ +8 ce mois</div><div class="stat-bar"><div class="stat-fill" style="width:47%;background:var(--ac)"></div></div></div>
+          <div class="stat"><div class="stat-label">Streams (iMusician)</div><div class="stat-value" style="color:var(--gn)">12.4K</div><div class="stat-delta delta-up">▲ +6.2%</div><div class="stat-bar"><div class="stat-fill" style="width:40%;background:var(--gn)"></div></div></div>
+          <div class="stat"><div class="stat-label">Pipeline booking</div><div class="stat-value" style="color:var(--am)">€3 200</div><div class="stat-delta delta-up">▲ 3 dates</div><div class="stat-bar"><div class="stat-fill" style="width:60%;background:var(--am)"></div></div></div>
+          <div class="stat"><div class="stat-label">Taux réponse mailing</div><div class="stat-value" style="color:#60A5FA">34%</div><div class="stat-delta delta-up">▲ +12pts</div><div class="stat-bar"><div class="stat-fill" style="width:34%;background:var(--bl)"></div></div></div>
+        </div>
+
+        <!-- Liens réseaux réels -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-head"><span class="card-title">🔗 Tes plateformes</span></div>
+          <div class="card-body">
+            <div class="network-links">
+              <a class="net-link" href="https://music.imusician.pro/artist/YanHill" target="_blank">🎵 iMusician</a>
+              <a class="net-link" href="https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg" target="_blank">▶️ YouTube</a>
+              <a class="net-link" href="https://www.facebook.com/yan.hill" target="_blank">📘 Facebook</a>
+              <a class="net-link" href="mailto:yanhill.backhit@gmail.com">✉ Email</a>
+              <span class="net-link" style="cursor:pointer;opacity:.6">🎧 Spotify (à connecter)</span>
+              <span class="net-link" style="cursor:pointer;opacity:.6">📸 Instagram (à connecter)</span>
+              <span class="net-link" style="cursor:pointer;opacity:.6">🎵 TikTok (à connecter)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-7-5" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-head"><span class="card-title">◎ Radar — Top opportunités France</span><button class="card-action" onclick="goPage('radar',null)">Voir tout →</button></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Radio France Bleu IDF</div><div class="row-sub">Radio · Île-de-France · prog@francebleu.fr</div></div><span class="score score-hi">92%</span><button class="ghost-btn" onclick="goPage('mailing',null)">Pitcher</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Festi'val en Seine 77</div><div class="row-sub">Festival · Seine-et-Marne · Local</div></div><span class="score score-hi">89%</span><button class="ghost-btn">Candidater</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Le Reflektor — Reims</div><div class="row-sub">Salle · Champagne-Ardenne · 1 500 pers.</div></div><span class="score score-md">74%</span><button class="ghost-btn">Contacter</button></div>
+              <div class="list-row"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="row-name">Groover.co</div><div class="row-sub">Plateforme pitch · Curateurs & Radios</div></div><span class="score score-lo">68%</span><button class="ghost-btn">Pitcher</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">✉ Mailing — En cours</span><button class="card-action" onclick="goPage('mailing',null)">Gérer →</button></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row"><div style="flex:1"><div class="row-name">Campagne Radios IDF</div><div class="row-sub">15 contacts · Prête à envoyer</div></div><span class="badge badge-amber">Draft</span></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Pitch Festivals 77</div><div class="row-sub">8 contacts · Envoyée</div></div><span class="badge badge-blue">Envoyée</span></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Curateurs Spotify</div><div class="row-sub">12 contacts · En préparation</div></div><span class="badge badge-gray">Draft</span></div>
+              <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)">
+                <div style="display:flex;justify-content:space-between;font-size:12px">
+                  <span style="color:var(--mu)">Taux ouverture moyen</span>
+                  <span style="color:var(--gn);font-weight:700">34%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPIDER NETWORK -->
+      <div id="page-spider" class="page">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="spider-legend">
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#10B981"></div>Deal / Chaud</div>
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#F59E0B"></div>Contacté / Tiède</div>
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#8B5CF6"></div>Cold / À pitcher</div>
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#3B82F6"></div>Radio</div>
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#EC4899"></div>Festival</div>
+            <div class="spider-leg-item"><div class="spider-leg-dot" style="background:#EF4444"></div>Label</div>
+          </div>
+          <button class="ghost-btn" onclick="toast('Nouveau contact ajouté au réseau !','success')">+ Ajouter contact</button>
+        </div>
+        <canvas id="spider-canvas"></canvas>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+          <div class="stat"><div class="stat-label">Nœuds réseau</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">47</div></div>
+          <div class="stat"><div class="stat-label">Connexions actives</div><div class="stat-value" style="font-size:20px;color:var(--gn)">23</div></div>
+          <div class="stat"><div class="stat-label">À relancer</div><div class="stat-value" style="font-size:20px;color:var(--am)">12</div></div>
+          <div class="stat"><div class="stat-label">Deals en cours</div><div class="stat-value" style="font-size:20px;color:var(--gn)">3</div></div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div id="page-crm" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <div style="flex:1;position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mu)">⌕</span>
+            <input type="text" style="width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px 8px 32px;color:var(--tx);font-size:13px;outline:none" placeholder="Rechercher un contact...">
+          </div>
+          <button class="ghost-btn">Type ▾</button>
+          <button class="ghost-btn" onclick="toast('Importez votre fichier CSV','success')">↑ CSV</button>
+          <button class="btn-accent" onclick="openModal('modal-contact')">+ Ajouter</button>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:14px">
+          <div class="stat"><div class="stat-label">Total</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">47</div></div>
+          <div class="stat"><div class="stat-label">Radio</div><div class="stat-value" style="font-size:20px;color:#60A5FA">12</div></div>
+          <div class="stat"><div class="stat-label">Festival</div><div class="stat-value" style="font-size:20px;color:var(--gn)">9</div></div>
+          <div class="stat"><div class="stat-label">Salle</div><div class="stat-value" style="font-size:20px;color:var(--am)">8</div></div>
+          <div class="stat"><div class="stat-label">Label</div><div class="stat-value" style="font-size:20px;color:var(--pk)">7</div></div>
+          <div class="stat"><div class="stat-label">Curateur</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">11</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◈ 47 contacts — Yan Hill</span></div>
+          <table class="os-table">
+            <thead><tr><th>Contact</th><th>Type</th><th>Statut</th><th>Ville</th><th>Dernier contact</th><th></th></tr></thead>
+            <tbody>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(59,130,246,.15);color:#60A5FA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">FB</div><div><div style="font-size:13px;font-weight:600">France Bleu IDF</div><div style="font-size:11px;color:var(--mu)">prog@francebleu.fr</div></div></div></td><td><span class="badge badge-blue">Radio</span></td><td><span class="badge badge-amber">Pitché</span></td><td>Paris</td><td style="color:var(--mu);font-size:12px">15/06/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();goPage('mailing',null)">✉ Relancer</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(16,185,129,.15);color:#34D399;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">FV</div><div><div style="font-size:13px;font-weight:600">Festi'val en Seine</div><div style="font-size:11px;color:var(--mu)">contact@festivalenseine.fr</div></div></div></td><td><span class="badge badge-green">Festival</span></td><td><span class="badge badge-blue">Contacté</span></td><td>Seine-et-Marne</td><td style="color:var(--mu);font-size:12px">10/06/2026</td><td><button class="ghost-btn" onclick="event.stopPropagation();goPage('mailing',null)">✉ Relancer</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(245,158,11,.15);color:var(--am);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">GR</div><div><div style="font-size:13px;font-weight:600">Groover.co</div><div style="font-size:11px;color:var(--mu)">Plateforme pitch</div></div></div></td><td><span class="badge badge-purple">Curateur</span></td><td><span class="badge badge-gray">Cold</span></td><td>Paris</td><td style="color:var(--mu);font-size:12px">—</td><td><button class="ghost-btn" onclick="event.stopPropagation();toast('Pitch généré !','success')">✦ Pitcher</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(139,92,246,.15);color:var(--ac2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">iM</div><div><div style="font-size:13px;font-weight:600">iMusician</div><div style="font-size:11px;color:var(--mu)">support@imusician.pro</div></div></div></td><td><span class="badge badge-purple">Distribution</span></td><td><span class="badge badge-green">Actif ✓</span></td><td>Suisse</td><td style="color:var(--mu);font-size:12px">Continu</td><td><button class="ghost-btn" onclick="event.stopPropagation();window.open('https://music.imusician.pro/artist/YanHill','_blank')">↗ Voir</button></td></tr>
+              <tr onclick="toast('Contact ouvert','success')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:7px;background:rgba(239,68,68,.15);color:var(--rd);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">RF</div><div><div style="font-size:13px;font-weight:600">Le Reflektor — Reims</div><div style="font-size:11px;color:var(--mu)">booking@reflektor.fr</div></div></div></td><td><span class="badge badge-amber">Salle</span></td><td><span class="badge badge-gray">Cold</span></td><td>Reims</td><td style="color:var(--mu);font-size:12px">—</td><td><button class="ghost-btn" onclick="event.stopPropagation();goPage('mailing',null)">✉ Pitcher</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MAILING -->
+      <div id="page-mailing" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="stat"><div class="stat-label">Campagnes</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">3</div></div>
+            <div class="stat"><div class="stat-label">Emails envoyés</div><div class="stat-value" style="font-size:20px;color:var(--bl)">35</div></div>
+            <div class="stat"><div class="stat-label">Taux ouverture</div><div class="stat-value" style="font-size:20px;color:var(--gn)">34%</div></div>
+            <div class="stat"><div class="stat-label">Réponses</div><div class="stat-value" style="font-size:20px;color:var(--am)">8</div></div>
+          </div>
+          <button class="btn-accent" onclick="openModal('modal-mailing')">+ Nouvelle campagne</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="card-head"><span class="card-title">✉ Campagnes actives</span></div>
+            <div class="card-body" style="padding:6px 16px">
+              <div class="list-row"><div style="flex:1"><div class="row-name">Campagne Radios IDF</div><div class="row-sub">15 contacts · France Bleu, NRJ, Fun Radio...</div></div><span class="badge badge-amber" style="margin-right:8px">Draft</span><button class="ghost-btn" onclick="toast('Campagne envoyée à 15 radios !','success')">Envoyer</button></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Pitch Festivals 77</div><div class="row-sub">8 contacts · Envoyée le 10/06</div></div><span class="badge badge-blue" style="margin-right:8px">Envoyée</span><button class="ghost-btn" onclick="toast('Stats : 4 ouvertures, 2 réponses','success')">Stats</button></div>
+              <div class="list-row"><div style="flex:1"><div class="row-name">Curateurs Spotify</div><div class="row-sub">12 contacts · En préparation</div></div><span class="badge badge-gray" style="margin-right:8px">Draft</span><button class="ghost-btn" onclick="openModal('modal-mailing')">Éditer</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><span class="card-title">✦ Templates IA — Yan Hill</span></div>
+            <div class="card-body">
+              <div class="template-card selected" id="tpl-radio">
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px">📻 Pitch Radio</div>
+                <div style="font-size:11px;color:var(--mu)">Email de présentation pour radios locales et nationales</div>
+              </div>
+              <div class="template-card" id="tpl-festival">
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px">🎪 Pitch Festival</div>
+                <div style="font-size:11px;color:var(--mu)">Candidature festivals en Île-de-France et région</div>
+              </div>
+              <div class="template-card" id="tpl-curator">
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px">♫ Pitch Curateur</div>
+                <div style="font-size:11px;color:var(--mu)">Pitch playlist Spotify et Apple Music</div>
+              </div>
+              <button class="ghost-btn" style="width:100%;margin-top:8px;text-align:center" onclick="openModal('modal-template')">✦ Générer email IA →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email preview -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">📧 Prévisualisation — Template Radio</span>
+            <div style="display:flex;gap:8px">
+              <button class="ghost-btn" onclick="toast('Email copié !','success')">📋 Copier</button>
+              <button class="btn-accent" style="font-size:12px;padding:5px 12px" onclick="toast('Campagne envoyée à 15 radios !','success')">Envoyer la campagne →</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="background:var(--bg3);border-radius:8px;padding:16px;font-size:13px;line-height:1.7;color:var(--tx)">
+              <div style="margin-bottom:8px"><strong>Objet :</strong> Proposition musicale — Yan Hill · Artiste indépendant · St Mammes (77)</div>
+              <div style="border-top:1px solid var(--bd);padding-top:12px">
+                Bonjour,<br><br>
+                Je me permets de vous contacter au sujet d'une possible collaboration ou diffusion de mes créations musicales.<br><br>
+                Je suis <strong>Yan Hill</strong>, artiste indépendant basé à <strong>St Mammes (Seine-et-Marne)</strong>. Ma musique est disponible sur toutes les plateformes via iMusician :<br>
+                → <span style="color:var(--ac2)">music.imusician.pro/artist/YanHill</span><br>
+                → <span style="color:var(--ac2)">YouTube : youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg</span><br><br>
+                Je serais ravi de vous faire parvenir un dossier de presse complet ou d'échanger sur les possibilités de collaboration.<br><br>
+                Bien cordialement,<br>
+                <strong>Yan Hill</strong><br>
+                <span style="color:var(--mu)">yanhill.backhit@gmail.com</span><br>
+                <span style="color:var(--mu)">St Mammes, Île-de-France</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RADAR -->
+      <div id="page-radar" class="page">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="ghost-btn" style="background:var(--ac);border-color:var(--ac);color:#fff">Tous</button>
+          <button class="ghost-btn">📻 Radio</button>
+          <button class="ghost-btn">🎪 Festival</button>
+          <button class="ghost-btn">🎭 Salle</button>
+          <button class="ghost-btn">♫ Curateur</button>
+          <button class="ghost-btn" style="margin-left:auto;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--ac2)" onclick="toast('Scan IA lancé — 18 opportunités détectées !','success')">✦ Scanner IA</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◎ 18 opportunités — France / IDF</span></div>
+          <div class="card-body" style="padding:6px 16px">
+            <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">France Bleu Île-de-France</div><div class="row-sub">Radio · Paris · prog.idf@radiofrance.com</div></div><span class="badge badge-blue" style="margin-right:8px">Radio</span><span class="score score-hi">92%</span><button class="ghost-btn" style="margin-left:8px" onclick="goPage('mailing',null)">✦ Pitcher</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Festi'val en Seine</div><div class="row-sub">Festival · Seine-et-Marne · Juin 2027</div></div><span class="badge badge-green" style="margin-right:8px">Festival</span><span class="score score-hi">89%</span><button class="ghost-btn" style="margin-left:8px" onclick="openModal('modal-candidature')">Candidater</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="row-name">Groover.co — Radios FR</div><div class="row-sub">Plateforme pitch · 200+ radios françaises</div></div><span class="badge badge-purple" style="margin-right:8px">Plateforme</span><span class="score score-hi">87%</span><button class="ghost-btn" style="margin-left:8px" onclick="window.open('https://groover.co','_blank')">↗ Accéder</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Le Reflektor — Reims</div><div class="row-sub">Salle de concert · 1 500 pers. · Champagne</div></div><span class="badge badge-amber" style="margin-right:8px">Salle</span><span class="score score-md">74%</span><button class="ghost-btn" style="margin-left:8px" onclick="toast('Email copié !','success')">✦ Pitcher</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">La Cigale — Paris</div><div class="row-sub">Salle de concert · Paris 18e · 1 100 pers.</div></div><span class="badge badge-amber" style="margin-right:8px">Salle</span><span class="score score-md">71%</span><button class="ghost-btn" style="margin-left:8px">Contacter</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="row-name">Radio Nova</div><div class="row-sub">Radio · Paris · Indépendante</div></div><span class="badge badge-blue" style="margin-right:8px">Radio</span><span class="score score-md">68%</span><button class="ghost-btn" style="margin-left:8px" onclick="goPage('mailing',null)">✦ Pitcher</button></div>
+            <div class="list-row"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="row-name">iMusician Playlist Pitch</div><div class="row-sub">Service intégré · Éditorial Spotify/Apple</div></div><span class="badge badge-purple" style="margin-right:8px">Curateur</span><span class="score score-lo">65%</span><button class="ghost-btn" style="margin-left:8px" onclick="window.open('https://imusician.pro','_blank')">↗ Accéder</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOCIAL -->
+      <div id="page-social" class="page">
+        <div style="margin-bottom:16px">
+          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="font-size:12px;font-weight:600;color:var(--am);margin-bottom:6px">⚠️ Réseaux sociaux à connecter</div>
+            <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Connecte tes comptes pour synchroniser les stats et publier directement depuis SLOOMIO.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="ghost-btn" onclick="toast('Connexion Instagram — requiert autorisation OAuth','success')">📸 Connecter Instagram</button>
+              <button class="ghost-btn" onclick="toast('Connexion TikTok — requiert autorisation OAuth','success')">🎵 Connecter TikTok</button>
+              <button class="ghost-btn" onclick="window.open('https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg','_blank')">▶️ YouTube connecté ↗</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="platform-card">
+            <div class="platform-icon" style="background:rgba(255,0,0,.1)">▶️</div>
+            <div style="flex:1">
+              <div class="platform-name">YouTube</div>
+              <div class="platform-handle">Yan Hill · <a href="https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg" target="_blank" style="color:var(--ac2);font-size:11px">Voir la chaîne ↗</a></div>
+              <div style="display:flex;gap:16px;margin-top:4px">
+                <div><div class="platform-stat" style="color:var(--rd)">—</div><div style="font-size:10px;color:var(--mu)">Abonnés</div></div>
+                <div><div class="platform-stat" style="color:var(--rd)">—</div><div style="font-size:10px;color:var(--mu)">Vues totales</div></div>
+              </div>
+            </div>
+            <span class="badge badge-green">Connecté</span>
+          </div>
+          <div class="platform-card">
+            <div class="platform-icon" style="background:rgba(59,130,246,.1)">📘</div>
+            <div style="flex:1">
+              <div class="platform-name">Facebook</div>
+              <div class="platform-handle">yan.hill · <a href="https://www.facebook.com/yan.hill" target="_blank" style="color:var(--ac2);font-size:11px">Voir la page ↗</a></div>
+              <div style="display:flex;gap:16px;margin-top:4px">
+                <div><div class="platform-stat" style="color:#60A5FA">—</div><div style="font-size:10px;color:var(--mu)">Abonnés</div></div>
+              </div>
+            </div>
+            <span class="badge badge-green">Connecté</span>
+          </div>
+          <div class="platform-card" style="opacity:.6">
+            <div class="platform-icon" style="background:rgba(236,72,153,.1)">📸</div>
+            <div style="flex:1"><div class="platform-name">Instagram</div><div class="platform-handle" style="color:var(--mu)">Non connecté</div></div>
+            <button class="ghost-btn" onclick="toast('Connexion Instagram bientôt disponible','success')">+ Connecter</button>
+          </div>
+          <div class="platform-card" style="opacity:.6">
+            <div class="platform-icon" style="background:rgba(20,184,166,.1)">🎵</div>
+            <div style="flex:1"><div class="platform-name">TikTok</div><div class="platform-handle" style="color:var(--mu)">Non connecté</div></div>
+            <button class="ghost-btn" onclick="toast('Connexion TikTok bientôt disponible','success')">+ Connecter</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◇ Planning contenu — cette semaine</span><button class="card-action" onclick="toast('Plan IA généré !','success')">✦ Générer plan IA</button></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">LUN</div><div style="border:1px dashed var(--bd2);border-radius:5px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mu);cursor:pointer;margin-bottom:4px">+</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">MAR</div><div style="border:1px solid rgba(255,0,0,.25);background:rgba(255,0,0,.08);border-radius:5px;padding:5px;text-align:center;font-size:9px;color:var(--rd);margin-bottom:4px">▶️<br>YT Short</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">MER</div><div style="border:1px dashed var(--bd2);border-radius:5px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mu);cursor:pointer;margin-bottom:4px">+</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">JEU</div><div style="border:1px solid rgba(59,130,246,.25);background:rgba(59,130,246,.08);border-radius:5px;padding:5px;text-align:center;font-size:9px;color:#60A5FA;margin-bottom:4px">📘<br>FB Post</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">VEN</div><div style="border:1px dashed var(--bd2);border-radius:5px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mu);cursor:pointer;margin-bottom:4px">+</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">SAM</div><div style="border:1px solid rgba(255,0,0,.25);background:rgba(255,0,0,.08);border-radius:5px;padding:5px;text-align:center;font-size:9px;color:var(--rd);margin-bottom:4px">▶️<br>YT Live</div></div>
+              <div><div style="text-align:center;font-size:9px;color:var(--mu);font-weight:600;margin-bottom:5px">DIM</div><div style="border:1px dashed var(--bd2);border-radius:5px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mu);cursor:pointer;margin-bottom:4px">+</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKING -->
+      <div id="page-booking" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="stat"><div class="stat-label">Opportunités</div><div class="stat-value" style="font-size:20px;color:var(--ac2)">6</div></div>
+            <div class="stat"><div class="stat-label">Pipeline</div><div class="stat-value" style="font-size:20px;color:var(--am)">€3 200</div></div>
+            <div class="stat"><div class="stat-label">Confirmés</div><div class="stat-value" style="font-size:20px;color:var(--gn)">€1 200</div></div>
+            <div class="stat"><div class="stat-label">Dates</div><div class="stat-value" style="font-size:20px;color:var(--bl)">3</div></div>
+          </div>
+          <button class="btn-accent" onclick="openModal('modal-booking')">+ Ajouter</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◆ Pipeline Kanban</span></div>
+          <div class="card-body">
+            <div class="pipe-grid">
+              <div>
+                <div class="pipe-col-title">Prospect <span style="background:var(--bg3);border-radius:7px;padding:1px 5px;font-size:8px">3</span></div>
+                <div class="pipe-card"><div class="pipe-venue">Le Reflektor — Reims</div><div class="pipe-detail">Salle 1 500 pers.</div><div class="pipe-fee">€ 800</div></div>
+                <div class="pipe-card"><div class="pipe-venue">La Cigale — Paris</div><div class="pipe-detail">À contacter</div><div class="pipe-fee">€ 1 200</div></div>
+                <div class="pipe-add" onclick="openModal('modal-booking')">+</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Contacté <span style="background:var(--bg3);border-radius:7px;padding:1px 5px;font-size:8px">2</span></div>
+                <div class="pipe-card"><div class="pipe-venue">Festi'val en Seine</div><div class="pipe-detail">Email envoyé · 10/06</div><div class="pipe-fee">€ 500</div></div>
+                <div class="pipe-card"><div class="pipe-venue">Bar Le Confluent</div><div class="pipe-detail">Melun · En attente</div><div class="pipe-fee">€ 300</div></div>
+                <div class="pipe-add">+</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Négociation <span style="background:var(--bg3);border-radius:7px;padding:1px 5px;font-size:8px">1</span></div>
+                <div class="pipe-card" style="border-left:2px solid var(--am);border-radius:0 8px 8px 0"><div class="pipe-venue">Scène locale St Mammes</div><div class="pipe-detail">Contrat en cours</div><div class="pipe-fee">€ 400</div></div>
+                <div class="pipe-add">+</div>
+              </div>
+              <div>
+                <div class="pipe-col-title">Confirmé ✓ <span style="background:var(--bg3);border-radius:7px;padding:1px 5px;font-size:8px">1</span></div>
+                <div class="pipe-card" style="border-left:2px solid var(--gn);border-radius:0 8px 8px 0"><div class="pipe-venue">Concert privé — 77</div><div class="pipe-detail">15 Juil. 2026 · Signé</div><div class="pipe-fee">€ 1 200</div></div>
+                <div class="pipe-add">+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCE -->
+      <div id="page-finance" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="stat"><div class="stat-label">Revenus 2026</div><div class="stat-value" style="color:var(--gn)">€2 400</div><div class="stat-delta delta-up">▲ Streaming + Live</div></div>
+            <div class="stat"><div class="stat-label">Dépenses 2026</div><div class="stat-value" style="color:var(--rd)">€890</div></div>
+            <div class="stat"><div class="stat-label">Bénéfice net</div><div class="stat-value" style="color:var(--ac2)">€1 510</div></div>
+          </div>
+          <button class="btn-accent" onclick="openModal('modal-finance')">+ Transaction</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">◑ Transactions — Yan Hill</span></div>
+          <table class="os-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Catégorie</th><th style="text-align:right">Montant</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--mu);font-size:12px">15/06</td><td>Streaming iMusician — Mai 2026</td><td><span class="badge badge-purple">Streaming</span></td><td style="text-align:right" class="fin-pos">+ €180</td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">01/06</td><td>Concert privé — Seine-et-Marne</td><td><span class="badge badge-blue">Live</span></td><td style="text-align:right" class="fin-pos">+ €1 200</td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">20/05</td><td>Abonnement iMusician AMPLIFY</td><td><span class="badge badge-gray">Distribution</span></td><td style="text-align:right" class="fin-neg">- €59</td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">15/05</td><td>Streaming iMusician — Avril 2026</td><td><span class="badge badge-purple">Streaming</span></td><td style="text-align:right" class="fin-pos">+ €145</td></tr>
+              <tr><td style="color:var(--mu);font-size:12px">10/05</td><td>SLOOMIO Pro — Mai</td><td><span class="badge badge-gray">Abonnement</span></td><td style="text-align:right" class="fin-neg">- €29</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTION -->
+      <div id="page-production" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="stat"><div class="stat-label">Idée</div><div class="stat-value" style="font-size:20px;color:var(--mu)">2</div></div>
+            <div class="stat"><div class="stat-label">En cours</div><div class="stat-value" style="font-size:20px;color:var(--ac)">2</div></div>
+            <div class="stat"><div class="stat-label">Mixage</div><div class="stat-value" style="font-size:20px;color:var(--am)">1</div></div>
+            <div class="stat"><div class="stat-label">Master</div><div class="stat-value" style="font-size:20px;color:var(--gn)">1</div></div>
+            <div class="stat"><div class="stat-label">Sorti</div><div class="stat-value" style="font-size:20px;color:var(--gn)">5</div></div>
+          </div>
+          <button class="btn-accent" onclick="toast('Nouveau projet créé !','success')">+ Nouveau projet</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">▷ Projets — Yan Hill</span></div>
+          <div class="card-body">
+            <div class="prog-row"><div class="prog-head"><span>🎵 Nouveau single — Mixage</span><span>75%</span></div><div class="prog-bar"><div class="prog-fill" style="width:75%;background:var(--am)"></div></div></div>
+            <div class="prog-row" style="margin-top:14px"><div class="prog-head"><span>🎹 EP 2026 — Arrangement</span><span>40%</span></div><div class="prog-bar"><div class="prog-fill" style="width:40%;background:var(--ac)"></div></div></div>
+            <div class="prog-row" style="margin-top:14px"><div class="prog-head"><span>💿 Collaboration feat. — Mastering</span><span>90%</span></div><div class="prog-bar"><div class="prog-fill" style="width:90%;background:var(--gn)"></div></div></div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)">
+              <div style="font-size:12px;font-weight:600;margin-bottom:8px">🚀 Sorties via iMusician</div>
+              <a href="https://music.imusician.pro/artist/YanHill" target="_blank" class="net-link" style="display:inline-flex;margin-right:8px">🎵 Voir mes sorties ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div id="page-analytics" class="page">
+        <div class="stats-grid" style="margin-bottom:16px">
+          <div class="stat"><div class="stat-label">Streams totaux</div><div class="stat-value" style="color:var(--ac2)">12.4K</div><div class="stat-delta delta-up">▲ +6.2%</div><div class="stat-bar"><div class="stat-fill" style="width:40%;background:var(--ac)"></div></div></div>
+          <div class="stat"><div class="stat-label">Plateformes actives</div><div class="stat-value" style="color:var(--gn)">200+</div><div class="stat-delta">via iMusician</div><div class="stat-bar"><div class="stat-fill" style="width:100%;background:var(--gn)"></div></div></div>
+          <div class="stat"><div class="stat-label">Contacts réseau</div><div class="stat-value" style="color:#60A5FA">47</div><div class="stat-delta delta-up">▲ +8</div><div class="stat-bar"><div class="stat-fill" style="width:47%;background:var(--bl)"></div></div></div>
+          <div class="stat"><div class="stat-label">Taux mailing</div><div class="stat-value" style="color:var(--am)">34%</div><div class="stat-delta delta-up">▲ +12pts</div><div class="stat-bar"><div class="stat-fill" style="width:34%;background:var(--am)"></div></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Top plateformes streaming</span></div>
+            <div class="card-body">
+              <div class="prog-row"><div class="prog-head"><span>Spotify</span><span>42%</span></div><div class="prog-bar"><div class="prog-fill" style="width:42%;background:#1DB954"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>Apple Music</span><span>21%</span></div><div class="prog-bar"><div class="prog-fill" style="width:21%;background:#FC3C44"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>YouTube Music</span><span>18%</span></div><div class="prog-bar"><div class="prog-fill" style="width:18%;background:#FF0000"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>Deezer</span><span>11%</span></div><div class="prog-bar"><div class="prog-fill" style="width:11%;background:#EF5466"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>Autres</span><span>8%</span></div><div class="prog-bar"><div class="prog-fill" style="width:8%;background:var(--mu)"></div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Audience géographique</span></div>
+            <div class="card-body">
+              <div class="prog-row"><div class="prog-head"><span>🇫🇷 France</span><span>68%</span></div><div class="prog-bar"><div class="prog-fill" style="width:68%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇧🇪 Belgique</span><span>12%</span></div><div class="prog-bar"><div class="prog-fill" style="width:12%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇨🇭 Suisse</span><span>8%</span></div><div class="prog-bar"><div class="prog-fill" style="width:8%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🇨🇦 Canada</span><span>6%</span></div><div class="prog-bar"><div class="prog-fill" style="width:6%;background:var(--ac)"></div></div></div>
+              <div class="prog-row"><div class="prog-head"><span>🌍 Autres</span><span>6%</span></div><div class="prog-bar"><div class="prog-fill" style="width:6%;background:var(--mu)"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IA MANAGER -->
+      <div id="page-ia" class="page">
+        <div class="ai-banner" style="margin-bottom:20px">
+          <div class="ai-avatar">✦<
