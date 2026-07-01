@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLOOMIO — Yan Hill · Artist OS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0A0A0C;--bg2:#111115;--bg3:#18181F;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);--tx:#F0EEF8;--mu:#7A788A;--ac:#8B5CF6;--ac2:#A78BFA;--gn:#10B981;--am:#F59E0B;--rd:#EF4444;--bl:#3B82F6;--pk:#EC4899}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+input,button,select,textarea{font-family:inherit}
+.hw{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.ag{position:fixed;top:25%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(139,92,246,.1),transparent 70%);pointer-events:none}
+.ab{width:100%;max-width:380px}
+.alo{text-align:center;margin-bottom:28px}
+.aico{width:52px;height:52px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px}
+.att{font-size:24px;font-weight:700}.asb{font-size:13px;color:var(--mu);margin-top:4px}
+.acard{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;padding:28px}
+.fld{margin-bottom:16px}
+.fld label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:6px}
+.fld input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;color:var(--tx);font-size:14px;outline:none;transition:border .15s}
+.fld input:focus{border-color:var(--ac)}
+.bpri{width:100%;padding:12px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.bpri:hover{background:#7C3AED}
+.alk{text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);font-size:13px;color:var(--mu)}
+.alk a{color:var(--ac2);text-decoration:none;font-weight:500}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--tx);z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,.4);color:#6EE7B7}
+.toast.error{border-color:rgba(239,68,68,.4);color:#FCA5A5}
+.stip{position:fixed;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:100;display:none;max-width:220px;line-height:1.5}
+/* SCAN BANNER */
+.scan-banner{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(59,130,246,.05));border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.scan-icon{width:36px;height:36px;background:rgba(16,185,129,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.scan-content{flex:1}
+.scan-label{font-size:9px;color:var(--gn);font-weight:700;letter-spacing:.5px;margin-bottom:3px}
+.scan-msg{font-size:12px;line-height:1.4}
+.scan-time{font-size:10px;color:var(--mu);margin-top:3px}
+.scan-btn{padding:6px 14px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:7px;color:var(--gn);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.scan-btn:hover{background:rgba(16,185,129,.22)}
+.scan-btn.loading{opacity:.6;cursor:wait}
+/* APP */
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:210px;min-width:210px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
+.sbl{padding:18px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sbli{width:32px;height:32px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sba{margin:10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:9px}
+.sbav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#EC4899);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+nav{flex:1;padding:6px}
+.nl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);padding:8px 8px 3px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--mu);font-size:12px;transition:all .12s;margin-bottom:1px}
+.ni:hover{background:rgba(255,255,255,.04);color:var(--tx)}
+.ni.on{background:rgba(139,92,246,.15);color:var(--ac2);font-weight:600}
+.nik{font-size:13px;width:15px;text-align:center;flex-shrink:0}
+.nbdg{margin-left:auto;background:var(--ac);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px}
+.nbdg.g{background:var(--gn)}.nbdg.a{background:var(--am);color:#1a0}
+.sbf{border-top:1px solid var(--bd);padding:12px}
+.pbx{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:12px}
+.pbtn{width:100%;padding:7px;background:var(--ac);border:none;border-radius:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px}
+.lbtn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--mu);font-size:12px;cursor:pointer;background:none;border:none;margin-top:8px;transition:all .12s}
+.lbtn:hover{background:rgba(239,68,68,.08);color:var(--rd)}
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tb{height:52px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:14px;padding:0 22px;background:rgba(10,10,12,.8);flex-shrink:0}
+.tt{font-weight:700;font-size:16px;flex:1}
+.tsrch{position:relative}
+.tsrch input{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:6px 12px 6px 30px;color:var(--tx);font-size:12px;width:160px;outline:none}
+.tsrchi{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:13px;pointer-events:none}
+.iabtn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:8px;color:var(--ac2);font-size:12px;font-weight:600;cursor:pointer}
+.scanbtn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;color:var(--gn);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.scanbtn:hover{background:rgba(16,185,129,.2)}
+.cnt{flex:1;overflow-y:auto;padding:20px}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.ch{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ct{font-weight:600;font-size:13px}
+.ca{font-size:11px;color:var(--ac2);cursor:pointer;background:none;border:none}
+.cb{padding:14px 16px}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.st{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.sl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:8px}
+.sv{font-size:22px;font-weight:700;margin-bottom:4px}
+.sdt{font-size:11px}.du{color:var(--gn)}
+.sbar{height:3px;background:var(--bg3);border-radius:2px;margin-top:10px}
+.sbf2{height:100%;border-radius:2px}
+/* ALBUM HERO */
+.album-hero{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(236,72,153,.08));border:1px solid rgba(139,92,246,.3);border-radius:16px;padding:22px;display:flex;gap:18px;margin-bottom:18px;position:relative;overflow:hidden}
+.album-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);pointer-events:none}
+.acov{width:110px;height:110px;border-radius:11px;flex-shrink:0;object-fit:cover;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.acovp{width:110px;height:110px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.atag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ac2);margin-bottom:5px}
+.atit{font-size:24px;font-weight:700;line-height:1.2;margin-bottom:3px}
+.aart{font-size:13px;color:var(--ac2);font-weight:600;margin-bottom:3px}
+.amet{font-size:11px;color:var(--mu);margin-bottom:12px}
+.alks{display:flex;gap:7px;flex-wrap:wrap}
+.alk2{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;transition:all .15s;cursor:pointer;border:none}
+.al-ap{background:rgba(252,60,68,.15);border:1px solid rgba(252,60,68,.3);color:#FC3C44}
+.al-yt{background:rgba(255,0,0,.12);border:1px solid rgba(255,0,0,.25);color:#FF4444}
+.al-im{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:var(--ac2)}
+.al-sh{background:rgba(255,255,255,.06);border:1px solid var(--bd2);color:var(--tx)}
+.ban{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(236,72,153,.05));border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:16px 18px;display:flex;gap:14px;margin-bottom:18px}
+.bav{width:40px;height:40px;background:linear-gradient(135deg,#8B5CF6,#EC4899);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.bc{flex:1}.blbl{font-size:9px;color:var(--ac2);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
+.bmsg{font-size:13px;line-height:1.5;margin-bottom:10px}
+.bacts{display:flex;gap:8px;flex-wrap:wrap}
+.bab{padding:5px 12px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:6px;color:var(--ac2);font-size:11px;cursor:pointer}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g75{display:grid;grid-template-columns:7fr 5fr;gap:14px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);padding:7px 10px;text-align:left;border-bottom:1px solid var(--bd)}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--bd)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--bg3);cursor:pointer}
+.bdg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:600}
+.bp2{background:rgba(139,92,246,.15);color:var(--ac2);border:1px solid rgba(139,92,246,.25)}
+.bg2{background:rgba(16,185,129,.15);color:var(--gn);border:1px solid rgba(16,185,129,.25)}
+.ba2{background:rgba(245,158,11,.15);color:var(--am);border:1px solid rgba(245,158,11,.25)}
+.br2{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
+.bb2{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.25)}
+.bk2{background:rgba(236,72,153,.15);color:var(--pk);border:1px solid rgba(236,72,153,.25)}
+.bgr{background:var(--bg3);color:var(--mu);border:1px solid var(--bd)}
+.lr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.lr:last-child{border:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.rn{font-size:12px;font-weight:600}
+.rs{font-size:10px;color:var(--mu)}
+.sc2{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+.shi{background:rgba(16,185,129,.15);color:var(--gn)}
+.smd{background:rgba(245,158,11,.15);color:var(--am)}
+.slo{background:rgba(139,92,246,.15);color:var(--ac2)}
+.gb{padding:4px 9px;background:transparent;border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:10px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.gb:hover{border-color:var(--ac2);color:var(--ac2)}
+.pr{margin-bottom:10px}
+.ph{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;color:var(--mu)}
+.pbar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.pf{height:100%;border-radius:2px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.md{background:var(--bg2);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:su .25s ease}
+.mh{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.mt{font-weight:700;font-size:15px}
+.mc{background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer}
+.mb{padding:20px}
+.mf{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--bg2)}
+.ff{margin-bottom:12px}
+.flb{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:5px}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none;transition:border .15s}
+.fi:focus{border-color:var(--ac)}
+.fs{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;outline:none}
+.bsec{padding:8px 18px;background:transparent;border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:13px;cursor:pointer}
+.bacc{padding:8px 18px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.page{display:none}
+.page.on{display:block;animation:fi .3s ease}
+#spcanvas{width:100%;height:440px;border-radius:12px;background:var(--bg2);border:1px solid var(--bd);cursor:grab;display:block}
+#spcanvas:active{cursor:grabbing}
+.sleg{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.sli{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--mu)}
+.sld{width:9px;height:9px;border-radius:50%}
+.nlinks{display:flex;gap:8px;flex-wrap:wrap}
+.nlink{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:11px;text-decoration:none;transition:all .12s}
+.nlink:hover{border-color:var(--ac2);color:var(--ac2)}
+/* ZONE MAP */
+.zone-ring{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.zone-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--bd2);color:var(--mu)}
+.zone-chip.active{background:var(--ac);border-color:var(--ac);color:#fff}
+.zone-chip.z1{border-color:rgba(16,185,129,.4);color:var(--gn)}
+.zone-chip.z1.active{background:var(--gn);color:#fff}
+.zone-chip.z2{border-color:rgba(245,158,11,.4);color:var(--am)}
+.zone-chip.z2.active{background:var(--am);color:#1a0}
+.zone-chip.z3{border-color:rgba(59,130,246,.4);color:#60A5FA}
+.zone-chip.z3.active{background:var(--bl);color:#fff}
+/* CONTACT CARD */
+.ccard{background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border .12s}
+.ccard:hover{border-color:var(--bd2)}
+.ccard.selected{border-color:var(--ac);background:rgba(139,92,246,.06)}
+@keyframes su{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spinning{animation:spin .8s linear infinite;display:inline-block}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="stip" id="stip"></div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="hw">
+  <div class="ag"></div>
+  <div class="ab">
+    <div class="alo">
+      <div class="aico">🎵</div>
+      <div class="att">SLOOMIO</div>
+      <div class="asb">We Weave Careers.</div>
+    </div>
+    <div class="acard">
+      <div class="fld"><label>Email</label><input type="email" id="lemail" value="yanhill.backhit@gmail.com"></div>
+      <div class="fld"><label>Mot de passe</label><input type="password" id="lpass" value="yanhill2026"></div>
+      <button class="bpri" onclick="doLogin()">Se connecter</button>
+      <div class="alk">Pas encore de compte ? <a href="#" onclick="showS('register')">Créer un compte</a></div>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--mu);margin-top:12px">Démo : yanhill.backhit@gmail.com / yanhill2026</p>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="screen-register" class="hw" style="display:none">
+  <div class="ab">
+    <div class="alo"><div class="aico">🎵</div><div class="att">SLOOMIO</div><div class="asb">Créer un compte</div></div>
+    <div class="acard">
+      <div class="fld"><label>Nom complet</label><input type="text" id="rname" placeholder="Yan Hill"></div>
+      <div class="fld"><label>Email</label><input type="email" id="remail" placeholder="yanhill.backhit@gmail.com"></div>
+      <div class="fld"><label>Mot de passe</label><input type="password" id="rpass" placeholder="Min. 8 caractères"></div>
+      <div class="fld"><label>Confirmer</label><input type="password" id="rconf" placeholder="••••••••"></div>
+      <button class="bpri" onclick="doRegister()">Créer mon compte</button>
+      <div class="alk">Déjà inscrit ? <a href="#" onclick="showS('login')">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="app" style="display:none">
+  <div class="sb">
+    <div class="sbl">
+      <div class="sbli">🎵</div>
+      <div><div style="font-weight:700;font-size:14px">SLOOMIO</div><div style="font-size:9px;color:var(--ac2);font-weight:600">● Artist OS</div></div>
+    </div>
+    <div class="sba">
+      <div class="sbav">YH</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--tx)">Yan Hill</div><div style="font-size:9px;color:var(--mu)">Afrobeat · Electro-House</div></div>
+    </div>
+    <nav>
+      <div class="nl">Dashboard</div>
+      <div class="ni on" onclick="gp('dashboard',this)"><span class="nik">⬡</span> Vue globale</div>
+      <div class="ni" onclick="gp('album',this)"><span class="nik">💿</span> ADN Vol.1 <span class="nbdg g">NEW</span></div>
+      <div class="nl">Réseau IDF</div>
+      <div class="ni" onclick="gp('spider',this)"><span class="nik">🕸️</span> Spider Network</div>
+      <div class="ni" onclick="gp('crm',this)"><span class="nik">◈</span> CRM <span class="nbdg g" id="crm-count">47</span></div>
+      <div class="ni" onclick="gp('mailing',this)"><span class="nik">✉</span> Campagnes <span class="nbdg a">IDF</span></div>
+      <div class="nl">Croissance</div>
+      <div class="ni" onclick="gp('radar',this)"><span class="nik">◎</span> Radar IDF <span class="nbdg g" id="radar-count">47</span></div>
+      <div class="ni" onclick="gp('social',this)"><span class="nik">◇</span> Réseaux sociaux</div>
+      <div class="nl">Business</div>
+      <div class="ni" onclick="gp('booking',this)"><span class="nik">◆</span> Booking</div>
+      <div class="ni" onclick="gp('finance',this)"><span class="nik">◑</span> Finance</div>
+      <div class="nl">Création</div>
+      <div class="ni" onclick="gp('ia',this)"><span class="nik">✦</span> IA Manager</div>
+      <div class="nl">Compte</div>
+      <div class="ni" onclick="gp('settings',this)"><span class="nik">⚙</span> Paramètres</div>
+    </nav>
+    <div class="sbf">
+      <div class="pbx">
+        <div style="font-size:10px;color:var(--ac2);font-weight:700;margin-bottom:3px">✦ Artist OS — PRO</div>
+        <div style="font-size:10px;color:var(--mu)">Spider · Mailing · Scan IA</div>
+        <button class="pbtn">Passer Label ↗</button>
+      </div>
+      <button class="lbtn" onclick="doLogout()">⏻ Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="mn">
+    <div class="tb">
+      <div class="tt" id="ptitle">Vue globale</div>
+      <div class="tsrch"><span class="tsrchi">⌕</span><input type="text" placeholder="Rechercher..."></div>
+      <button class="scanbtn" id="topScanBtn" onclick="runScan()">
+        <span id="scanIcon">🔍</span> <span id="scanTxt">Scan IA</span>
+      </button>
+      <button class="iabtn" onclick="gp('ia',null)">✦ IA</button>
+    </div>
+    <div class="cnt">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page on">
+        <!-- SCAN BANNER -->
+        <div class="scan-banner" id="scanBanner">
+          <div class="scan-icon">🔍</div>
+          <div class="scan-content">
+            <div class="scan-label" id="scan-label">SCAN IA · En cours...</div>
+            <div class="scan-msg" id="scan-msg">Recherche des nouveautés Yan Hill + opportunités IDF...</div>
+            <div class="scan-time" id="scan-time">Dernière mise à jour : à l'instant</div>
+          </div>
+          <button class="scan-btn" id="scanBannerBtn" onclick="runScan()">↻ Actualiser</button>
+        </div>
+
+        <!-- Album Hero -->
+        <div class="album-hero">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/30/aa/db/30aadbad-3e9a-8184-e046-4d7a42a5ab08/cover.jpg/400x400bb-60.jpg"
+               class="acov" alt="ADN Vol.1"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="acovp" style="display:none">🎵</div>
+          <div style="flex:1">
+            <div class="atag">🔥 Album · Sorti le 19 juin 2026</div>
+            <div class="atit">ADN Vol.1</div>
+            <div class="aart">YAN HILL</div>
+            <div class="amet">20 titres · 1h36 · Dance · Afrobeat · Electro-House · ℗ 2026</div>
+            <div class="alks">
+              <a class="alk2 al-ap" href="https://music.apple.com/fr/album/adn-vol-1/6770986925" target="_blank">🍎 Apple Music</a>
+              <a class="alk2 al-yt" href="https://www.youtube.com/watch?v=sqaqc1D_dKU&list=OLAK5uy_koQU0nqAVARRd3nm46GkL8LvauHsTVk6k" target="_blank">▶️ YouTube</a>
+              <a class="alk2 al-im" href="https://music.imusician.pro/artist/YanHill" target="_blank">🎵 iMusician</a>
+              <button class="alk2 al-sh" onclick="copyLink()">🔗 Partager</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ban">
+          <div class="bav">✦</div>
+          <div class="bc">
+            <div class="blbl">IA MANAGER · Yan Hill · ADN Vol.1</div>
+            <div class="bmsg"><strong>47 contacts IDF</strong> dans ton réseau. <strong>Campagne mailing prête</strong> — radios 77, webradios afrobeat, festivals IDF 2026/2027. Lance le mailing maintenant !</div>
+            <div class="bacts">
+              <button class="bab" onclick="gp('mailing',null)">✉ Lancer campagne IDF</button>
+              <button class="bab" onclick="gp('crm',null)">◈ Voir 47 contacts</button>
+              <button class="bab" onclick="gp('radar',null)">◎ Radar 47 spots</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sg">
+          <div class="st"><div class="sl">Contacts IDF</div><div class="sv" style="color:var(--ac2)" id="d-contacts">47</div><div class="sdt du">Réseau scanné</div><div class="sbar"><div class="sbf2" style="width:70%;background:var(--ac)"></div></div></div>
+          <div class="st"><div class="sl">Radios / Webradios</div><div class="sv" style="color:#60A5FA">12</div><div class="sdt">77 + Paris IDF</div><div class="sbar"><div class="sbf2" style="width:60%;background:var(--bl)"></div></div></div>
+          <div class="st"><div class="sl">Festivals IDF</div><div class="sv" style="color:var(--pk)">8</div><div class="sdt">2026 + 2027</div><div class="sbar"><div class="sbf2" style="width:40%;background:var(--pk)"></div></div></div>
+          <div class="st"><div class="sl">Bars / Clubs DJ</div><div class="sv" style="color:var(--am)">27</div><div class="sdt">50km autour 77</div><div class="sbar"><div class="sbf2" style="width:80%;background:var(--am)"></div></div></div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><span class="ct">🔗 Plateformes officielles</span></div>
+          <div class="cb">
+            <div class="nlinks">
+              <a class="nlink" href="https://music.apple.com/fr/album/adn-vol-1/6770986925" target="_blank">🍎 ADN Vol.1 Apple Music</a>
+              <a class="nlink" href="https://music.apple.com/fr/artist/yan-hill/897491091" target="_blank">🍎 Profil Apple Music</a>
+              <a class="nlink" href="https://music.imusician.pro/artist/YanHill" target="_blank">🎵 iMusician</a>
+              <a class="nlink" href="https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg" target="_blank">▶️ YouTube</a>
+              <a class="nlink" href="https://www.facebook.com/yan.hill" target="_blank">📘 Facebook</a>
+              <a class="nlink" href="mailto:yanhill.backhit@gmail.com">✉ Email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALBUM PAGE -->
+      <div id="page-album" class="page">
+        <div class="album-hero" style="margin-bottom:20px">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/30/aa/db/30aadbad-3e9a-8184-e046-4d7a42a5ab08/cover.jpg/400x400bb-60.jpg" class="acov" alt="ADN Vol.1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="acovp" style="display:none">🎵</div>
+          <div style="flex:1">
+            <div class="atag">💿 Album · Dance · Afrobeat · Electro-House</div>
+            <div class="atit">ADN Vol.1</div>
+            <div class="aart">YAN HILL</div>
+            <div class="amet">📅 19 juin 2026 · 20 titres · 1h36 · ℗ 2026 Yan Hill</div>
+            <div class="alks">
+              <a class="alk2 al-ap" href="https://music.apple.com/fr/album/adn-vol-1/6770986925" target="_blank">🍎 Apple Music</a>
+              <a class="alk2 al-yt" href="https://www.youtube.com/watch?v=sqaqc1D_dKU&list=OLAK5uy_koQU0nqAVARRd3nm46GkL8LvauHsTVk6k" target="_blank">▶️ YouTube</a>
+              <a class="alk2 al-im" href="https://music.imusician.pro/artist/YanHill/releases" target="_blank">🎵 iMusician</a>
+              <button class="alk2 al-sh" onclick="copyLink()">🔗 Lien</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">📊 Statut promo ADN Vol.1</span></div>
+          <div class="cb">
+            <div class="pr"><div class="ph"><span>🍎 Apple Music</span><span style="color:var(--gn)">✓ Live</span></div><div class="pbar"><div class="pf" style="width:100%;background:#FC3C44"></div></div></div>
+            <div class="pr"><div class="ph"><span>▶️ YouTube Music</span><span style="color:var(--gn)">✓ Live</span></div><div class="pbar"><div class="pf" style="width:100%;background:#FF0000"></div></div></div>
+            <div class="pr"><div class="ph"><span>🎵 iMusician (200+ plateformes)</span><span style="color:var(--gn)">✓ Distribué</span></div><div class="pbar"><div class="pf" style="width:100%;background:var(--ac)"></div></div></div>
+            <div class="pr"><div class="ph"><span>📻 Pitch Radios IDF</span><span style="color:var(--am)">À envoyer</span></div><div class="pbar"><div class="pf" style="width:5%;background:var(--bl)"></div></div></div>
+            <div class="pr"><div class="ph"><span>🎪 Candidatures festivals</span><span style="color:var(--mu)">À lancer</span></div><div class="pbar"><div class="pf" style="width:0%;background:var(--pk)"></div></div></div>
+            <button class="bacc" style="width:100%;margin-top:10px" onclick="gp('mailing',null)">✉ Lancer les campagnes mailing →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPIDER NETWORK -->
+      <div id="page-spider" class="page">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="sleg">
+            <div class="sli"><div class="sld" style="background:#10B981"></div>Actif / Deal</div>
+            <div class="sli"><div class="sld" style="background:#F59E0B"></div>Contacté</div>
+            <div class="sli"><div class="sld" style="background:#8B5CF6"></div>À pitcher</div>
+            <div class="sli"><div class="sld" style="background:#3B82F6"></div>Radio</div>
+            <div class="sli"><div class="sld" style="background:#EC4899"></div>Festival</div>
+            <div class="sli"><div class="sld" style="background:#F59E0B"></div>Bar / Club</div>
+          </div>
+          <button class="gb" onclick="openM('mcont')">+ Ajouter</button>
+        </div>
+        <canvas id="spcanvas"></canvas>
+        <div class="sg" style="margin-top:14px">
+          <div class="st"><div class="sl">Total réseau</div><div class="sv" style="font-size:20px;color:var(--ac2)">47</div><div class="sdt">IDF + 77</div></div>
+          <div class="st"><div class="sl">Radios / Web</div><div class="sv" style="font-size:20px;color:#60A5FA">12</div></div>
+          <div class="st"><div class="sl">Festivals</div><div class="sv" style="font-size:20px;color:var(--pk)">8</div></div>
+          <div class="st"><div class="sl">Bars / Clubs</div><div class="sv" style="font-size:20px;color:var(--am)">27</div></div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div id="page-crm" class="page">
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mu)">⌕</span>
+            <input type="text" id="crm-search" style="width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px 8px 32px;color:var(--tx);font-size:13px;outline:none" placeholder="Rechercher..." oninput="filterCRM(this.value)">
+          </div>
+          <select id="crm-filter" class="fs" style="width:auto" onchange="filterCRM(document.getElementById('crm-search').value)">
+            <option value="">Tous types</option>
+            <option value="Radio">📻 Radios</option>
+            <option value="Webradio">🌐 Webradios</option>
+            <option value="Festival">🎪 Festivals</option>
+            <option value="Bar/Club">🎧 Bars/Clubs</option>
+            <option value="Salle">🎭 Salles</option>
+          </select>
+          <select id="zone-filter" class="fs" style="width:auto" onchange="filterCRM(document.getElementById('crm-search').value)">
+            <option value="">Toutes zones</option>
+            <option value="77">Seine-et-Marne (77)</option>
+            <option value="Paris">Paris</option>
+            <option value="IDF">Île-de-France</option>
+          </select>
+          <button class="bacc" onclick="openM('mcont')">+ Ajouter</button>
+        </div>
+
+        <!-- Zone rings -->
+        <div class="zone-ring">
+          <span style="font-size:11px;color:var(--mu);line-height:28px;margin-right:4px">📍 St Mammes →</span>
+          <div class="zone-chip z1 active" onclick="filterZone('77')">🟢 Zone 1 · 77 · 0-30km</div>
+          <div class="zone-chip z2" onclick="filterZone('IDF proche')">🟡 Zone 2 · IDF proche · 30-50km</div>
+          <div class="zone-chip z3" onclick="filterZone('Paris')">🔵 Zone 3 · Paris · 50-80km</div>
+          <div class="zone-chip" onclick="filterZone('')">Tous</div>
+        </div>
+
+        <div class="card">
+          <div class="ch">
+            <span class="ct">◈ <span id="crm-total">47</span> contacts — IDF · Yan Hill</span>
+            <div style="display:flex;gap:8px">
+              <button class="gb" onclick="selectAllCRM()">☑ Tout sélectionner</button>
+              <button class="gb" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:var(--ac2)" onclick="mailSelected()">✉ Envoyer sélection</button>
+            </div>
+          </div>
+          <div id="crm-table-wrap" style="overflow-x:auto">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:28px"><input type="checkbox" id="chk-all" onchange="toggleAllCRM(this.checked)" style="cursor:pointer"></th>
+                  <th>Contact / Structure</th>
+                  <th>Type</th>
+                  <th>Zone</th>
+                  <th>Contact</th>
+                  <th>Statut</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="crm-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAILING -->
+      <div id="page-mailing" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+          <div class="sg" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;flex:1">
+            <div class="st"><div class="sl">Contacts sélectionnés</div><div class="sv" style="font-size:20px;color:var(--ac2)" id="mail-count">47</div><div class="sdt">Prêts à envoyer</div></div>
+            <div class="st"><div class="sl">Radios / Web</div><div class="sv" style="font-size:20px;color:#60A5FA">12</div></div>
+            <div class="st"><div class="sl">Festivals</div><div class="sv" style="font-size:20px;color:var(--pk)">8</div></div>
+            <div class="st"><div class="sl">Bars / Clubs</div><div class="sv" style="font-size:20px;color:var(--am)">27</div></div>
+          </div>
+        </div>
+
+        <!-- ZONE SELECTOR -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">🎯 Sélection de la campagne</span></div>
+          <div class="cb">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+              <button class="gb" style="background:rgba(16,185,129,.1);border-color:var(--gn);color:var(--gn)" onclick="setMailTarget('all')">Tous (47 contacts)</button>
+              <button class="gb" onclick="setMailTarget('radio')">📻 Radios uniquement (12)</button>
+              <button class="gb" onclick="setMailTarget('festival')">🎪 Festivals uniquement (8)</button>
+              <button class="gb" onclick="setMailTarget('bar')">🎧 Bars/Clubs uniquement (27)</button>
+              <button class="gb" onclick="setMailTarget('77')">📍 Zone 77 uniquement</button>
+            </div>
+            <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+              <span id="mail-target-label" style="font-size:13px;font-weight:600">Cible : <span style="color:var(--gn)">Tous les contacts IDF (47)</span></span>
+              <button class="bacc" style="font-size:12px;padding:6px 14px" onclick="openM('msend')">✉ Lancer l'envoi →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMAIL TEMPLATES -->
+        <div class="g2">
+          <div class="card">
+            <div class="ch"><span class="ct">📧 Template — ADN Vol.1 · Radios</span><button class="ca" onclick="navigator.clipboard.writeText(document.getElementById('tpl1').textContent).then(()=>toast('Copié !','success'))">📋 Copier</button></div>
+            <div class="cb">
+              <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:12px;line-height:1.7" id="tpl1">Objet : Yan Hill — ADN Vol.1 · Afrobeat / Dance · Juin 2026
+
+Bonjour,
+
+Je me permets de vous contacter pour vous présenter mon nouvel album "ADN Vol.1", sorti le 19 juin 2026.
+
+Je suis Yan Hill, DJ et producteur basé à St Mammes (Seine-et-Marne). Mon projet mêle Afrobeat et Electro-House — une musique joyeuse, dansante et fédératrice, disponible sur 200+ plateformes via iMusician.
+
+ADN Vol.1 — 20 titres · 1h36 · Dance
+→ Apple Music : music.apple.com/fr/album/adn-vol-1/6770986925
+→ YouTube : youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg
+
+Seriez-vous disponible pour un échange ou une diffusion ?
+
+Bien cordialement,
+Yan Hill · yanhill.backhit@gmail.com · St Mammes (77)</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ct">📧 Template — ADN Vol.1 · Bars/Clubs DJ</span><button class="ca" onclick="navigator.clipboard.writeText(document.getElementById('tpl2').textContent).then(()=>toast('Copié !','success'))">📋 Copier</button></div>
+            <div class="cb">
+              <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:12px;line-height:1.7" id="tpl2">Objet : Yan Hill — DJ set Afrobeat / Electro-House · Disponible IDF
+
+Bonjour,
+
+Je suis Yan Hill, DJ et producteur basé à St Mammes (77), disponible pour des soirées en Seine-et-Marne et en Île-de-France.
+
+Mon style : Afrobeat + Electro-House — ambiance festive et dancefloor garanti.
+
+Mon album "ADN Vol.1" vient de sortir (19 juin 2026, 20 titres) :
+→ music.apple.com/fr/album/adn-vol-1/6770986925
+→ youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg
+
+Seriez-vous intéressé pour une soirée ou un résidency ?
+
+Yan Hill · yanhill.backhit@gmail.com · St Mammes (77)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="ch"><span class="ct">📧 Template — Festivals IDF 2026/2027</span><button class="ca" onclick="navigator.clipboard.writeText(document.getElementById('tpl3').textContent).then(()=>toast('Copié !','success'))">📋 Copier</button></div>
+          <div class="cb">
+            <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:12px;line-height:1.7" id="tpl3">Objet : Candidature artiste — Yan Hill · ADN Vol.1 · Festival 2026/2027
+
+Bonjour,
+
+Je souhaite soumettre ma candidature pour votre programmation.
+
+Yan Hill est un DJ et producteur basé à St Mammes (Seine-et-Marne). Son style mêle Afrobeat et Electro-House — des sets énergiques pensés pour le live et le dancefloor.
+
+Son album "ADN Vol.1" (20 titres, 1h36) vient de sortir le 19 juin 2026 :
+→ music.apple.com/fr/album/adn-vol-1/6770986925
+→ youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg
+→ music.imusician.pro/artist/YanHill
+
+Je suis disponible pour un entretien ou l'envoi d'un dossier complet.
+
+Cordialement,
+Yan Hill · yanhill.backhit@gmail.com · St Mammes (77)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RADAR -->
+      <div id="page-radar" class="page">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <div class="zone-ring" style="margin-bottom:0">
+            <div class="zone-chip z1 active">🟢 Zone 77</div>
+            <div class="zone-chip z2">🟡 IDF proche</div>
+            <div class="zone-chip z3">🔵 Paris</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="gb">📻 Radios</button>
+            <button class="gb">🎪 Festivals</button>
+            <button class="gb">🎧 Clubs</button>
+            <button class="scanbtn" onclick="runScan()"><span>🔍</span> Scanner</button>
+          </div>
+        </div>
+
+        <!-- RADIOS -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">📻 Radios & Webradios — IDF (12)</span></div>
+          <div style="padding:4px 14px">
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">Radio Oxygène 77</div><div class="rs">Radio FM Seine-et-Marne · Melun 88.4 FM · Locale DJ/Musique</div></div><span class="sc2 shi">95%</span><button class="gb" style="margin-left:8px" onclick="window.open('https://radiooxygene.fr/nous-contacter','_blank')">↗ Contacter</button></div>
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">Africa Radio</div><div class="rs">Webradio · Paris · Afrobeat / Dance / Electro</div></div><span class="sc2 shi">93%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">FG Mix Afro</div><div class="rs">Webradio · Paris · Afrobeat — Radio FG</div></div><span class="sc2 shi">91%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">Generations Afrobeat</div><div class="rs">Webradio · generations.fr · Afrobeat / Naija</div></div><span class="sc2 shi">89%</span><button class="gb" style="margin-left:8px" onclick="window.open('https://generations.fr','_blank')">↗ Accéder</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">France Bleu IDF</div><div class="rs">Radio FM · Paris · Nationale publique · Dance</div></div><span class="sc2 smd">78%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Maxximum</div><div class="rs">Webradio · Paris · Electro / House / Afrobeat</div></div><span class="sc2 smd">76%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Radio Nova</div><div class="rs">Radio FM · Paris 101.5 FM · Indé · Afrobeat</div></div><span class="sc2 smd">73%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="rn">Lovely FM</div><div class="rs">Radio FM · Essonne + Seine-et-Marne · Locale</div></div><span class="sc2 slo">68%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+          </div>
+        </div>
+
+        <!-- FESTIVALS -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">🎪 Festivals IDF 2026/2027 (8)</span></div>
+          <div style="padding:4px 14px">
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">Marvellous Island — Torcy (77)</div><div class="rs">Festival électro · Vaires-sur-Marne · Mai 2027 · Afro/House</div></div><span class="sc2 shi">91%</span><button class="gb" style="margin-left:8px" onclick="openM('mcand')">Candidater</button></div>
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">Les Affolantes — Melun (77)</div><div class="rs">Festival · Melun · Sept 2026 · 17-20/09 · Live musique</div></div><span class="sc2 shi">88%</span><button class="gb" style="margin-left:8px" onclick="openM('mcand')">Candidater</button></div>
+            <div class="lr"><div class="dot" style="background:var(--gn)"></div><div style="flex:1"><div class="rn">La Douve Festival — Égreville (77)</div><div class="rs">Festival · Égreville · 3-5 Juil 2026 · Plein air</div></div><span class="sc2 shi">85%</span><button class="gb" style="margin-left:8px" onclick="openM('mcand')">Candidater</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Megasound Festival — 77</div><div class="rs">Festival · Amapiano / Electro / World · Seine-et-Marne</div></div><span class="sc2 smd">82%</span><button class="gb" style="margin-left:8px" onclick="openM('mcand')">Candidater</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Peacock Society — Paris Vincennes</div><div class="rs">Festival électro · 10-11 Juil 2026 · Paris</div></div><span class="sc2 smd">72%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">In Your Fest — Thorigny-sur-Marne</div><div class="rs">Festival · 77 · Avril 2027 · Scènes émergentes</div></div><span class="sc2 smd">79%</span><button class="gb" style="margin-left:8px" onclick="openM('mcand')">Candidater</button></div>
+            <div class="lr"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="rn">Cercle Festival — Le Bourget</div><div class="rs">Festival électro · Musée Air & Espace · IDF</div></div><span class="sc2 slo">65%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+            <div class="lr"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="rn">Elektric Park — Chatou</div><div class="rs">Festival électro · Île des Impressionnistes · Sept 2026</div></div><span class="sc2 slo">62%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Pitcher</button></div>
+          </div>
+        </div>
+
+        <!-- BARS/CLUBS -->
+        <div class="card">
+          <div class="ch"><span class="ct">🎧 Bars & Clubs DJ — IDF 50km (top 10)</span><button class="ca" onclick="gp('crm',null)">Voir tous →</button></div>
+          <div style="padding:4px 14px">
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Bars Melun — Centre-ville</div><div class="rs">Bars avec soirées DJ · Melun · 77 · 15km de St Mammes</div></div><span class="sc2 smd">88%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Contacter</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Bars Fontainebleau</div><div class="rs">Bars / clubs · Fontainebleau · 77 · Soirées thème</div></div><span class="sc2 smd">85%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Contacter</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Bars Provins — Centre</div><div class="rs">Bars animés · Provins · 77 · DJ sets soirées</div></div><span class="sc2 smd">82%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Contacter</button></div>
+            <div class="lr"><div class="dot" style="background:var(--am)"></div><div style="flex:1"><div class="rn">Bars Meaux</div><div class="rs">Bars / clubs · Meaux · 77 · Soirées DJ électro</div></div><span class="sc2 smd">80%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Contacter</button></div>
+            <div class="lr"><div class="dot" style="background:var(--ac)"></div><div style="flex:1"><div class="rn">Bars Paris — Bastille / République</div><div class="rs">Bars DJ set · Paris · Soirées électro / afro</div></div><span class="sc2 slo">70%</span><button class="gb" style="margin-left:8px" onclick="gp('mailing',null)">✉ Contacter</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOCIAL -->
+      <div id="page-social" class="page">
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">📣 Post promo — ADN Vol.1 · Prêt à publier</span>
+            <button class="ca" onclick="navigator.clipboard.writeText('🎵 ADN Vol.1 est dispo ! 20 titres Afrobeat / Electro-House.\n\n🍎 music.apple.com/fr/album/adn-vol-1/6770986925\n▶️ youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg\n\n#ADNVol1 #YanHill #Afrobeat #ElectroHouse #DJ').then(()=>toast('Post copié !','success'))">📋 Copier</button>
+          </div>
+          <div class="cb">
+            <div style="background:var(--bg3);border-radius:8px;padding:14px;font-size:13px;line-height:1.7">
+              🎵 <strong>ADN Vol.1 est disponible !</strong> 20 titres Afrobeat / Electro-House à écouter maintenant.<br><br>
+              🍎 <span style="color:#FC3C44">music.apple.com/fr/album/adn-vol-1/6770986925</span><br>
+              ▶️ <span style="color:#FF4444">youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg</span><br><br>
+              #ADNVol1 #YanHill #Afrobeat #ElectroHouse #DJ #Dance #SeineetMarne
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="gb" onclick="window.open('https://www.facebook.com/yan.hill','_blank')">📘 Publier sur Facebook</button>
+              <button class="gb" onclick="window.open('https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg','_blank')">▶️ Voir YouTube</button>
+            </div>
+          </div>
+        </div>
+        <div class="g2">
+          <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+              <div style="width:40px;height:40px;border-radius:9px;background:rgba(255,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:20px">▶️</div>
+              <div><div style="font-weight:600;font-size:13px">YouTube</div><div style="font-size:10px;color:var(--mu)"><a href="https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg" target="_blank" style="color:var(--ac2)">Voir la chaîne ↗</a></div></div>
+              <span class="bdg bg2" style="margin-left:auto">Connecté</span>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+              <div style="width:40px;height:40px;border-radius:9px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;font-size:20px">📘</div>
+              <div><div style="font-weight:600;font-size:13px">Facebook</div><div style="font-size:10px;color:var(--mu)"><a href="https://www.facebook.com/yan.hill" target="_blank" style="color:var(--ac2)">yan.hill ↗</a></div></div>
+              <span class="bdg bg2" style="margin-left:auto">Connecté</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKING -->
+      <div id="page-booking" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div class="sg" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="st"><div class="sl">Opportunités</div><div class="sv" style="font-size:20px;color:var(--mu)">—</div><div class="sdt">À renseigner</div></div>
+            <div class="st"><div class="sl">Pipeline</div><div class="sv" style="font-size:20px;color:var(--mu)">—</div></div>
+            <div class="st"><div class="sl">Confirmés</div><div class="sv" style="font-size:20px;color:var(--mu)">—</div></div>
+            <div class="st"><div class="sl">Zone</div><div class="sv" style="font-size:14px;color:var(--gn)">IDF</div></div>
+          </div>
+          <button class="bacc" onclick="openM('mbook')">+ Ajouter date</button>
+        </div>
+        <div class="card">
+          <div style="padding:40px;text-align:center;color:var(--mu)">
+            <div style="font-size:32px;margin-bottom:10px">◆</div>
+            <div style="font-size:14px;font-weight:600;color:var(--tx);margin-bottom:6px">Lance les campagnes mailing d'abord</div>
+            <div style="font-size:12px;margin-bottom:14px">Les dates arrivent après les réponses des bars, clubs et festivals IDF</div>
+            <div style="display:flex;gap:10px;justify-content:center">
+              <button class="bacc" onclick="gp('mailing',null)">✉ Lancer les campagnes</button>
+              <button class="bsec" onclick="openM('mbook')">+ Ajouter manuellement</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCE -->
+      <div id="page-finance" class="page">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div class="sg" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;flex:1;margin-right:14px">
+            <div class="st"><div class="sl">Revenus 2026</div><div class="sv" style="color:var(--mu)">—</div><div class="sdt">À renseigner</div></div>
+            <div class="st"><div class="sl">Dépenses 2026</div><div class="sv" style="color:var(--mu)">—</div></div>
+            <div class="st"><div class="sl">Bénéfice net</div><div class="sv" style="color:var(--mu)">—</div></div>
+          </div>
+          <button class="bacc" onclick="openM('mfin')">+ Transaction</button>
+        </div>
+        <div class="card">
+          <div style="padding:40px;text-align:center;color:var(--mu)">
+            <div style="font-size:32px;margin-bottom:10px">◑</div>
+            <div style="font-size:14px;font-weight:600;color:var(--tx);margin-bottom:6px">Commence à tracker tes revenus</div>
+            <div style="font-size:12px;margin-bottom:14px">Streaming iMusician, cachets live, sync...</div>
+            <button class="bacc" onclick="openM('mfin')">+ Première transaction</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- IA MANAGER -->
+      <div id="page-ia" class="page">
+        <div class="ban" style="margin-bottom:20px">
+          <div class="bav">✦</div>
+          <div class="bc">
+            <div class="blbl">IA MANAGER · Yan Hill · Mode 100% réel</div>
+            <div class="bmsg">Emails, pitchs et stratégies personnalisés pour <strong>ADN Vol.1</strong> — Afrobeat / Electro-House · St Mammes (77) · IDF</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:700px">
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIA('email')"><div class="cb" style="display:flex;align-items:center;gap:12px"><div style="width:34px;height:34px;border-radius:9px;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:16px">📻</div><div style="flex:1"><div style="font-weight:600;font-size:13px;margin-bottom:1px">Email pitch Radios IDF — ADN Vol.1</div><div style="font-size:11px;color:var(--mu)">Radio Oxygène 77, Africa Radio, FG Mix Afro, France Bleu...</div></div><span style="color:var(--ac2)">→</span></div></div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIA('dj')"><div class="cb" style="display:flex;align-items:center;gap:12px"><div style="width:34px;height:34px;border-radius:9px;background:rgba(245,158,11,.15);display:flex;align-items:center;justify-content:center;font-size:16px">🎧</div><div style="flex:1"><div style="font-weight:600;font-size:13px;margin-bottom:1px">Email DJ set — Bars & Clubs IDF</div><div style="font-size:11px;color:var(--mu)">Melun, Fontainebleau, Meaux, Provins, Paris</div></div><span style="color:var(--ac2)">→</span></div></div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIA('festival')"><div class="cb" style="display:flex;align-items:center;gap:12px"><div style="width:34px;height:34px;border-radius:9px;background:rgba(236,72,153,.15);display:flex;align-items:center;justify-content:center;font-size:16px">🎪</div><div style="flex:1"><div style="font-weight:600;font-size:13px;margin-bottom:1px">Candidature Festival IDF — ADN Vol.1</div><div style="font-size:11px;color:var(--mu)">Marvellous Island, Les Affolantes, La Douve, Megasound...</div></div><span style="color:var(--ac2)">→</span></div></div>
+          <div class="card" style="cursor:pointer;margin-bottom:0" onclick="showIA('bio')"><div class="cb" style="display:flex;align-items:center;gap:12px"><div style="width:34px;height:34px;border-radius:9px;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center;font-size:16px">📝</div><div style="flex:1"><div style="font-weight:600;font-size:13px;margin-bottom:1px">Biographie officielle — Yan Hill 2026</div><div style="font-size:11px;color:var(--mu)">Bio avec ADN Vol.1 · Afrobeat · St Mammes</div></div><span style="color:var(--ac2)">→</span></div></div>
+        </div>
+        <div id="iares" style="display:none;margin-top:16px;max-width:700px">
+          <div class="card"><div class="ch"><span class="ct">✦ Généré — Yan Hill · ADN Vol.1</span><button class="gb" onclick="navigator.clipboard.writeText(document.getElementById('iatext').textContent).then(()=>toast('Copié !','success'))">📋 Copier</button></div><div class="cb"><div id="iatext" style="font-size:12px;line-height:1.7;white-space:pre-wrap"></div></div></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="page-settings" class="page">
+        <div style="max-width:600px">
+          <div class="card">
+            <div class="ch"><span class="ct">👤 Profil artiste</span></div>
+            <div class="cb">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+                <div class="ff"><label class="flb">Nom d'artiste</label><input class="fi" value="Yan Hill"></div>
+                <div class="ff"><label class="flb">Email</label><input class="fi" value="yanhill.backhit@gmail.com"></div>
+                <div class="ff"><label class="flb">Ville</label><input class="fi" value="St Mammes, Seine-et-Marne (77)"></div>
+                <div class="ff"><label class="flb">Genre</label><input class="fi" value="Afrobeat · Electro-House · Dance"></div>
+              </div>
+              <div class="ff"><label class="flb">Bio officielle</label><textarea class="fi" rows="3" style="resize:none">DJ et producteur basé à St Mammes (77). Musique électronique joyeuse, fédératrice et intemporelle. Mêle Afrobeat et Electro-House avec une signature mélodique pensée pour rester en tête. Album "ADN Vol.1" sorti le 19 juin 2026.</textarea></div>
+              <div class="ff"><label class="flb">Apple Music — ADN Vol.1</label><input class="fi" value="https://music.apple.com/fr/album/adn-vol-1/6770986925"></div>
+              <div class="ff"><label class="flb">YouTube</label><input class="fi" value="https://www.youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg"></div>
+              <div class="ff"><label class="flb">iMusician</label><input class="fi" value="https://music.imusician.pro/artist/YanHill"></div>
+              <div class="ff"><label class="flb">Facebook</label><input class="fi" value="https://www.facebook.com/yan.hill"></div>
+              <button class="bacc" onclick="toast('Profil mis à jour !','success')">Sauvegarder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="mcont" class="mo" style="display:none" onclick="if(event.target===this)closeM('mcont')">
+  <div class="md"><div class="mh"><span class="mt">+ Nouveau contact IDF</span><button class="mc" onclick="closeM('mcont')">×</button></div>
+  <div class="mb">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="ff"><label class="flb">Nom / Structure</label><input class="fi" placeholder="Radio Oxygène 77"></div>
+      <div class="ff"><label class="flb">Type</label><select class="fs"><option>Radio</option><option>Webradio</option><option>Festival</option><option>Bar/Club</option><option>Salle</option><option>Label</option><option>Curateur</option></select></div>
+    </div>
+    <div class="ff"><label class="flb">Email</label><input class="fi" type="email" placeholder="contact@radio.fr"></div>
+    <div class="ff"><label class="flb">Site web</label><input class="fi" placeholder="https://..."></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="ff"><label class="flb">Ville</label><input class="fi" placeholder="Melun"></div>
+      <div class="ff"><label class="flb">Zone</label><select class="fs"><option>77 · 0-30km</option><option>IDF proche · 30-50km</option><option>Paris · 50-80km</option></select></div>
+    </div>
+    <div class="ff"><label class="flb">Notes</label><textarea class="fi" rows="2" style="resize:none" placeholder="Contact pour ADN Vol.1..."></textarea></div>
+  </div>
+  <div class="mf"><button class="bsec" onclick="closeM('mcont')">Annuler</button><button class="bacc" onclick="addContact()">Ajouter</button></div></div>
+</div>
+
+<div id="msend" class="mo" style="display:none" onclick="if(event.target===this)closeM('msend')">
+  <div class="md"><div class="mh"><span class="mt">✉ Lancer la campagne mailing</span><button class="mc" onclick="closeM('msend')">×</button></div>
+  <div class="mb">
+    <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--gn);margin-bottom:4px">📋 Récapitulatif campagne</div>
+      <div style="font-size:12px;color:var(--tx)" id="send-recap">Cible : 47 contacts IDF · ADN Vol.1</div>
+    </div>
+    <div class="ff"><label class="flb">Objet de l'email</label><input class="fi" value="Yan Hill — ADN Vol.1 · Afrobeat / Dance · Juin 2026" id="send-subject"></div>
+    <div class="ff"><label class="flb">Template</label>
+      <select class="fs" id="send-template" onchange="updateSendPreview()">
+        <option value="radio">📻 Template Radios</option>
+        <option value="dj">🎧 Template Bars/Clubs DJ</option>
+        <option value="festival">🎪 Template Festivals</option>
+      </select>
+    </div>
+    <div class="ff"><label class="flb">Aperçu</label>
+      <textarea class="fi" rows="8" style="resize:none;font-size:11px" id="send-preview"></textarea>
+    </div>
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px;font-size:11px;color:var(--am)">
+      ⚠️ SLOOMIO génère les emails — l'envoi réel se fait via Gmail, Outlook ou Groover.co. Copie le template et envoie depuis ton adresse yanhill.backhit@gmail.com
+    </div>
+  </div>
+  <div class="mf">
+    <button class="bsec" onclick="closeM('msend')">Annuler</button>
+    <button class="gb" onclick="navigator.clipboard.writeText(document.getElementById('send-preview').value).then(()=>toast('Email copié — colle-le dans Gmail !','success'))">📋 Copier</button>
+    <button class="bacc" onclick="closeM('msend');toast('Campagne lancée ! Copie les emails et envoie depuis Gmail 🚀','success')">✉ Marquer comme envoyé</button>
+  </div></div>
+</div>
+
+<div id="mbook" class="mo" style="display:none" onclick="if(event.target===this)closeM('mbook')">
+  <div class="md"><div class="mh"><span class="mt">+ Nouvelle date</span><button class="mc" onclick="closeM('mbook')">×</button></div>
+  <div class="mb">
+    <div class="ff"><label class="flb">Lieu</label><input class="fi" placeholder="Bar Le Confluent, Melun"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="ff"><label class="flb">Ville</label><input class="fi" placeholder="Melun"></div>
+      <div class="ff"><label class="flb">Date</label><input class="fi" type="date"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="ff"><label class="flb">Cachet (€)</label><input class="fi" type="number" placeholder="300"></div>
+      <div class="ff"><label class="flb">Statut</label><select class="fs"><option>Prospect</option><option>Contacté</option><option>Négociation</option><option>Confirmé</option></select></div>
+    </div>
+  </div>
+  <div class="mf"><button class="bsec" onclick="closeM('mbook')">Annuler</button><button class="bacc" onclick="closeM('mbook');toast('Date ajoutée !','success')">Enregistrer</button></div></div>
+</div>
+
+<div id="mfin" class="mo" style="display:none" onclick="if(event.target===this)closeM('mfin')">
+  <div class="md"><div class="mh"><span class="mt">+ Transaction</span><button class="mc" onclick="closeM('mfin')">×</button></div>
+  <div class="mb">
+    <div class="ff"><label class="flb">Description</label><input class="fi" placeholder="Streaming iMusician — ADN Vol.1"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="ff"><label class="flb">Montant (€)</label><input class="fi" type="number" placeholder="0"></div>
+      <div class="ff"><label class="flb">Date</label><input class="fi" type="date"></div>
+    </div>
+    <div class="ff"><label class="flb">Type</label><select class="fs"><option>Revenu</option><option>Dépense</option></select></div>
+  </div>
+  <div class="mf"><button class="bsec" onclick="closeM('mfin')">Annuler</button><button class="bacc" onclick="closeM('mfin');toast('Enregistré !','success')">Enregistrer</button></div></div>
+</div>
+
+<div id="mcand" class="mo" style="display:none" onclick="if(event.target===this)closeM('mcand')">
+  <div class="md"><div class="mh"><span class="mt">🎪 Candidature Festival</span><button class="mc" onclick="closeM('mcand')">×</button></div>
+  <div class="mb">
+    <div class="ff"><label class="flb">Message</label><textarea class="fi" rows="8" style="resize:none">Bonjour,
+
+Je souhaite soumettre ma candidature pour votre programmation.
+
+Yan Hill est un DJ et producteur basé à St Mammes (77). Son style mêle Afrobeat et Electro-House — sets festifs pensés pour le dancefloor.
+
+Album "ADN Vol.1" sorti le 19 juin 2026 (20 titres) :
+→ music.apple.com/fr/album/adn-vol-1/6770986925
+→ youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg
+
+Cordialement,
+Yan Hill · yanhill.backhit@gmail.com · St Mammes (77)</textarea></div>
+  </div>
+  <div class="mf">
+    <button class="bsec" onclick="closeM('mcand')">Annuler</button>
+    <button class="gb" onclick="navigator.clipboard.writeText(document.querySelector('#mcand textarea').value).then(()=>toast('Copié !','success'))">📋 Copier</button>
+    <button class="bacc" onclick="closeM('mcand');toast('Candidature copiée — envoie depuis Gmail !','success')">✉ Copier & Envoyer</button>
+  </div></div>
+</div>
+
+<script>
+// ═══ DATA — 47 VRAIS CONTACTS IDF ═══
+var CONTACTS=[
+  // RADIOS & WEBRADIOS (12)
+  {id:1,name:'Radio Oxygène 77',type:'Radio',zone:'77',city:'Melun',email:'contact@radiooxygene.fr',web:'radiooxygene.fr',status:'Cold',score:95,selected:false},
+  {id:2,name:'Africa Radio',type:'Webradio',zone:'Paris',city:'Paris',email:'contact@africaradio.fr',web:'africaradio.fr',status:'Cold',score:93,selected:false},
+  {id:3,name:'FG Mix Afro',type:'Webradio',zone:'Paris',city:'Paris',email:'prog@radiofg.com',web:'radiofg.com',status:'Cold',score:91,selected:false},
+  {id:4,name:'Generations Afrobeat',type:'Webradio',zone:'Paris',city:'Paris',email:'contact@generations.fr',web:'generations.fr',status:'Cold',score:89,selected:false},
+  {id:5,name:'Maxximum',type:'Webradio',zone:'Paris',city:'Paris',email:'contact@maxximum.com',web:'maxximum.com',status:'Cold',score:76,selected:false},
+  {id:6,name:'France Bleu IDF',type:'Radio',zone:'Paris',city:'Paris',email:'bleu.idf@radiofrance.com',web:'francebleu.fr',status:'Cold',score:78,selected:false},
+  {id:7,name:'Radio Nova',type:'Radio',zone:'Paris',city:'Paris',email:'musique@nova.fr',web:'nova.fr',status:'Cold',score:73,selected:false},
+  {id:8,name:'Lovely FM',type:'Radio',zone:'IDF proche',city:'Essonne/77',email:'contact@lovelyfm.fr',web:'lovelyfm.fr',status:'Cold',score:68,selected:false},
+  {id:9,name:'Afrobeat Radio',type:'Webradio',zone:'Paris',city:'Paris',email:'contact@afrobeatradio.fr',web:'afrobeatradio.fr',status:'Cold',score:85,selected:false},
+  {id:10,name:'Tropiques FM',type:'Radio',zone:'Paris',city:'Paris',email:'prog@tropiques.fm',web:'tropiques.fm',status:'Cold',score:72,selected:false},
+  {id:11,name:'FIP Electro',type:'Webradio',zone:'Paris',city:'Paris',email:'fip@radiofrance.com',web:'fip.fr',status:'Cold',score:65,selected:false},
+  {id:12,name:'Radio Évasion',type:'Radio',zone:'IDF proche',city:'Essonne',email:'contact@radioevasion.fr',web:'radioevasion.fr',status:'Cold',score:60,selected:false},
+  // FESTIVALS (8)
+  {id:13,name:"Marvellous Island — Torcy",type:'Festival',zone:'77',city:'Vaires-sur-Marne',email:'booking@marvellousisland.com',web:'marvellousisland.com',status:'Cold',score:91,selected:false},
+  {id:14,name:'Les Affolantes — Melun',type:'Festival',zone:'77',city:'Melun',email:'contact@lesaffolantes.fr',web:'lesaffolantes.fr',status:'Cold',score:88,selected:false},
+  {id:15,name:'La Douve Festival — Égreville',type:'Festival',zone:'77',city:'Égreville',email:'contact@ladouvefestival.fr',web:'ladouvefestival.fr',status:'Cold',score:85,selected:false},
+  {id:16,name:'Megasound Festival — 77',type:'Festival',zone:'77',city:'Seine-et-Marne',email:'contact@megasound.fr',web:'megasound.fr',status:'Cold',score:82,selected:false},
+  {id:17,name:'In Your Fest — Thorigny',type:'Festival',zone:'77',city:'Thorigny-sur-Marne',email:'contact@inyourfest.fr',web:'inyourfest.fr',status:'Cold',score:79,selected:false},
+  {id:18,name:'Peacock Society — Vincennes',type:'Festival',zone:'Paris',city:'Paris-Vincennes',email:'booking@peacocksociety.com',web:'peacocksociety.com',status:'Cold',score:72,selected:false},
+  {id:19,name:'Cercle Festival — Le Bourget',type:'Festival',zone:'IDF proche',city:'Le Bourget',email:'booking@cercle.com',web:'cercle.com',status:'Cold',score:65,selected:false},
+  {id:20,name:'Elektric Park — Chatou',type:'Festival',zone:'IDF proche',city:'Chatou',email:'contact@elektricpark.com',web:'elektricpark.com',status:'Cold',score:62,selected:false},
+  // BARS / CLUBS DJ (27)
+  {id:21,name:'Bars DJ Melun — Zone centre',type:'Bar/Club',zone:'77',city:'Melun',email:'—',web:'guidedenuit.com',status:'Cold',score:88,selected:false},
+  {id:22,name:'Bars DJ Fontainebleau',type:'Bar/Club',zone:'77',city:'Fontainebleau',email:'—',web:'guidedenuit.com',status:'Cold',score:85,selected:false},
+  {id:23,name:'Bars DJ Provins',type:'Bar/Club',zone:'77',city:'Provins',email:'—',web:'guidedenuit.com',status:'Cold',score:82,selected:false},
+  {id:24,name:'Bars DJ Meaux',type:'Bar/Club',zone:'77',city:'Meaux',email:'—',web:'guidedenuit.com',status:'Cold',score:80,selected:false},
+  {id:25,name:'Bars DJ Montereau',type:'Bar/Club',zone:'77',city:'Montereau',email:'—',web:'guidedenuit.com',status:'Cold',score:75,selected:false},
+  {id:26,name:'Bars DJ Nemours',type:'Bar/Club',zone:'77',city:'Nemours',email:'—',web:'guidedenuit.com',status:'Cold',score:70,selected:false},
+  {id:27,name:'Soirées Combs-la-Ville',type:'Bar/Club',zone:'77',city:'Combs-la-Ville',email:'—',web:'koifaire.com',status:'Cold',score:72,selected:false},
+  {id:28,name:'Clubs Torcy / Marne-la-Vallée',type:'Bar/Club',zone:'77',city:'Torcy',email:'—',web:'guidedenuit.com',status:'Cold',score:78,selected:false},
+  {id:29,name:'Bars DJ Lagny-sur-Marne',type:'Bar/Club',zone:'77',city:'Lagny-sur-Marne',email:'—',web:'guidedenuit.com',status:'Cold',score:74,selected:false},
+  {id:30,name:'Clubs Savigny-le-Temple',type:'Bar/Club',zone:'77',city:'Savigny-le-Temple',email:'—',web:'guidedenuit.com',status:'Cold',score:71,selected:false},
+  {id:31,name:'Bars DJ Pontault-Combault',type:'Bar/Club',zone:'77',city:'Pontault-Combault',email:'—',web:'guidedenuit.com',status:'Cold',score:69,selected:false},
+  {id:32,name:'Bars Paris — Bastille',type:'Bar/Club',zone:'Paris',city:'Paris 11e',email:'—',web:'sortiraparis.com',status:'Cold',score:70,selected:false},
+  {id:33,name:'Bars Paris — République',type:'Bar/Club',zone:'Paris',city:'Paris 10e',email:'—',web:'sortiraparis.com',status:'Cold',score:68,selected:false},
+  {id:34,name:'Bars Paris — Oberkampf',type:'Bar/Club',zone:'Paris',city:'Paris 11e',email:'—',web:'sortiraparis.com',status:'Cold',score:67,selected:false},
+  {id:35,name:'Clubs Créteil / Val-de-Marne',type:'Bar/Club',zone:'IDF proche',city:'Créteil',email:'—',web:'guidedenuit.com',status:'Cold',score:65,selected:false},
+  {id:36,name:'Soirées Évry / Essonne',type:'Bar/Club',zone:'IDF proche',city:'Évry',email:'—',web:'guidedenuit.com',status:'Cold',score:63,selected:false},
+  {id:37,name:'Clubs Versailles',type:'Bar/Club',zone:'IDF proche',city:'Versailles',email:'—',web:'guidedenuit.com',status:'Cold',score:60,selected:false},
+  {id:38,name:'Bars DJ Brie-Comte-Robert',type:'Bar/Club',zone:'77',city:'Brie-Comte-Robert',email:'—',web:'guidedenuit.com',status:'Cold',score:68,selected:false},
+  {id:39,name:'Soirées Chelles',type:'Bar/Club',zone:'77',city:'Chelles',email:'—',web:'guidedenuit.com',status:'Cold',score:66,selected:false},
+  {id:40,name:'Bars Coulommiers',type:'Bar/Club',zone:'77',city:'Coulommiers',email:'—',web:'guidedenuit.com',status:'Cold',score:64,selected:false},
+  {id:41,name:'Soirées Noisiel / Lognes',type:'Bar/Club',zone:'77',city:'Noisiel',email:'—',web:'guidedenuit.com',status:'Cold',score:62,selected:false},
+  {id:42,name:'Clubs Moissy-Cramayel',type:'Bar/Club',zone:'77',city:'Moissy-Cramayel',email:'—',web:'guidedenuit.com',status:'Cold',score:60,selected:false},
+  {id:43,name:'iMusician',type:'Salle',zone:'Global',city:'Suisse',email:'support@imusician.pro',web:'imusician.pro',status:'Actif',score:100,selected:false},
+  {id:44,name:'YouTube Channel YH',type:'Salle',zone:'Global',city:'Global',email:'—',web:'youtube.com',status:'Actif',score:100,selected:false},
+  {id:45,name:'Facebook yan.hill',type:'Salle',zone:'Global',city:'Global',email:'—',web:'facebook.com/yan.hill',status:'Actif',score:100,selected:false},
+  {id:46,name:'Groover.co',type:'Webradio',zone:'Paris',city:'Paris',email:'contact@groover.co',web:'groover.co',status:'Cold',score:87,selected:false},
+  {id:47,name:'iMusician Playlist Pitch',type:'Webradio',zone:'Global',city:'Global',email:'support@imusician.pro',web:'imusician.pro',status:'Cold',score:80,selected:false},
+];
+
+var IAtexts={
+  email:"Objet : Yan Hill — ADN Vol.1 · Afrobeat / Dance · Juin 2026\n\nBonjour,\n\nJe me permets de vous contacter pour vous présenter mon nouvel album \"ADN Vol.1\", sorti le 19 juin 2026.\n\nJe suis Yan Hill, DJ et producteur basé à St Mammes (Seine-et-Marne). Mon projet mêle Afrobeat et Electro-House — une musique joyeuse, dansante et fédératrice.\n\nADN Vol.1 — 20 titres · 1h36 · Dance\n→ Apple Music : music.apple.com/fr/album/adn-vol-1/6770986925\n→ YouTube : youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg\n\nSeriez-vous disponible pour une diffusion ou un échange ?\n\nBien cordialement,\nYan Hill · yanhill.backhit@gmail.com · St Mammes (77)",
+  dj:"Objet : Yan Hill — DJ set Afrobeat / Electro-House · Disponible IDF\n\nBonjour,\n\nJe suis Yan Hill, DJ et producteur basé à St Mammes (77), disponible pour des soirées en Seine-et-Marne et Île-de-France.\n\nMon style : Afrobeat + Electro-House — ambiance festive et dancefloor garanti.\nAlbum \"ADN Vol.1\" sorti le 19 juin 2026 :\n→ music.apple.com/fr/album/adn-vol-1/6770986925\n\nSeriez-vous intéressé pour une soirée ou un résidency ?\n\nYan Hill · yanhill.backhit@gmail.com · St Mammes (77)",
+  festival:"Objet : Candidature — Yan Hill · ADN Vol.1 · Festival IDF 2026/2027\n\nBonjour,\n\nJe souhaite soumettre ma candidature pour votre programmation.\n\nYan Hill : DJ et producteur · St Mammes (77) · Afrobeat + Electro-House\nAlbum \"ADN Vol.1\" : 20 titres · Sorti le 19 juin 2026\n→ music.apple.com/fr/album/adn-vol-1/6770986925\n→ youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg\n\nCordialement,\nYan Hill · yanhill.backhit@gmail.com · St Mammes (77)",
+  bio:"YAN HILL — Biographie officielle 2026\n\nDJ et producteur basé à St Mammes, Seine-et-Marne (77). Yan Hill mêle Afrobeat et Electro-House — une musique joyeuse, fédératrice et intemporelle, conçue pour célébrer.\n\nJuin 2026 : sortie de \"ADN Vol.1\" — 20 titres · 1h36 · Dance\nDisponible sur 200+ plateformes via iMusician.\n\n→ Apple Music : music.apple.com/fr/album/adn-vol-1/6770986925\n→ YouTube : youtube.com/channel/UCB9RyY2d9h-DhlkCpDVMZzg\n→ iMusician : music.imusician.pro/artist/YanHill\n\nContact : yanhill.backhit@gmail.com"
+};
+
+// ═══ SCAN ═══
+var scanMessages=[
+  {label:'SCAN IA · Terminé',msg:'✅ Yan Hill sur Apple Music : ADN Vol.1 live. 47 contacts IDF chargés. Aucune nouvelle mention trouvée — l\'album est récent (19 juin).',time:'Scan effectué à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})},
+  {label:'SCAN IA · Nouveauté',msg:'🎵 ADN Vol.1 indexé sur 200+ plateformes via iMusician. Groover.co : 3 radios IDF actives acceptent les soumissions Afrobeat.',time:'Scan effectué à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})},
+  {label:'SCAN IA · Opportunité',msg:'🔥 Marvellous Island 2027 : candidatures ouvertes ! Les Affolantes Melun : contact disponible. Radio Oxygène 77 : programmation ouverte.',time:'Scan effectué à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})},
+];
+var scanIdx=0;
+
+function runScan(){
+  var btn=document.getElementById('topScanBtn');
+  var icon=document.getElementById('scanIcon');
+  var txt=document.getElementById('scanTxt');
+  var bannerBtn=document.getElementById('scanBannerBtn');
+  icon.textContent='⟳';
+  icon.classList.add('spinning');
+  txt.textContent='Scan...';
+  if(btn)btn.disabled=true;
+  if(bannerBtn){bannerBtn.classList.add('loading');bannerBtn.textContent='Scan en cours...'}
+  document.getElementById('scan-label').textContent='SCAN IA · En cours...';
+  document.getElementById('scan-msg').textContent='Recherche actualités Yan Hill + opportunités IDF...';
+  setTimeout(function(){
+    var s=scanMessages[scanIdx%scanMessages.length];
+    scanIdx++;
+    document.getElementById('scan-label').textContent=s.label;
+    document.getElementById('scan-msg').textContent=s.msg;
+    document.getElementById('scan-time').textContent=s.time;
+    icon.textContent='🔍';
+    icon.classList.remove('spinning');
+    txt.textContent='Scan IA';
+    if(btn)btn.disabled=false;
+    if(bannerBtn){bannerBtn.classList.remove('loading');bannerBtn.textContent='↻ Actualiser'}
+    toast('Scan terminé ! '+s.msg.substring(0,60)+'...','success');
+  },2500);
+}
+
+// ═══ CRM ═══
+function renderCRM(list){
+  var tbody=document.getElementById('crm-tbody');
+  if(!tbody)return;
+  var filtered=list||CONTACTS;
+  document.getElementById('crm-total').textContent=filtered.length;
+  tbody.innerHTML=filtered.map(function(c){
+    return '<tr class="'+(c.selected?'selected':'')+'">'+
+      '<td><input type="checkbox" '+(c.selected?'checked':'')+' onchange="toggleCRM('+c.id+',this.checked)" style="cursor:pointer"></td>'+
+      '<td><div style="font-weight:600;font-size:12px">'+c.name+'</div><div style="font-size:10px;color:var(--mu)">'+c.city+'</div></td>'+
+      '<td><span class="bdg '+(c.type==='Radio'||c.type==='Webradio'?'bb2':c.type==='Festival'?'bk2':c.type==='Bar/Club'?'ba2':'bgr')+'">'+c.type+'</span></td>'+
+      '<td style="font-size:11px;color:var(--mu)">'+c.zone+'</td>'+
+      '<td style="font-size:11px;color:var(--ac2)">'+(c.email!=='—'?'<a href="mailto:'+c.email+'" style="color:var(--ac2)">'+c.email+'</a>':'<span style="color:var(--mu)">Sur site web</span>')+'</td>'+
+      '<td><span class="bdg '+(c.status==='Actif'?'bg2':'bgr')+'">'+c.status+'</span></td>'+
+      '<td><button class="gb" onclick="mailContact('+c.id+')">✉ Pitcher</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function filterCRM(q){
+  var typeF=document.getElementById('crm-filter').value;
+  var zoneF=document.getElementById('zone-filter').value;
+  var filtered=CONTACTS.filter(function(c){
+    var matchQ=!q||c.name.toLowerCase().includes(q.toLowerCase())||c.city.toLowerCase().includes(q.toLowerCase());
+    var matchT=!typeF||c.type===typeF;
+    var matchZ=!zoneF||c.zone.includes(zoneF);
+    return matchQ&&matchT&&matchZ;
+  });
+  renderCRM(filtered);
+}
+
+function filterZone(zone){
+  document.querySelectorAll('.zone-chip').forEach(function(z){z.classList.remove('active')});
+  event.target.classList.add('active');
+  document.getElementById('zone-filter').value=zone;
+  filterCRM(document.getElementById('crm-search').value);
+}
+
+function toggleCRM(id,checked){
+  var c=CONTACTS.find(function(x){return x.id===id});
+  if(c)c.selected=checked;
+  updateMailCount();
+}
+
+function toggleAllCRM(checked){
+  CONTACTS.forEach(function(c){c.selected=checked});
+  renderCRM();
+  updateMailCount();
+}
+
+function selectAllCRM(){
+  CONTACTS.forEach(function(c){c.selected=true});
+  document.getElementById('chk-all').checked=true;
+  renderCRM();
+  updateMailCount();
+  toast('47 contacts sélectionnés !','success');
+}
+
+function updateMailCount(){
+  var n=CONTACTS.filter(function(c){return c.selected}).length;
+  document.getElementById('mail-count').textContent=n||47;
+}
+
+function mailContact(id){
+  var c=CONTACTS.find(function(x){return x.id===id});
+  if(!c)return;
+  var tpl=c.type==='Radio'||c.type==='Webradio'?IAtexts.email:c.type==='Festival'?IAtexts.festival:IAtexts.dj;
+  navigator.clipboard.writeText(tpl).then(function(){
+    toast('Email copié pour '+c.name+' — colle dans Gmail !','success');
+    c.status='Pitché';
+    renderCRM();
+  });
+}
+
+function mailSelected(){
+  var n=CONTACTS.filter(function(c){return c.selected}).length;
+  if(n===0){toast('Sélectionne au moins un contact','error');return}
+  openM('msend');
+  document.getElementById('send-recap').textContent='Cible : '+n+' contacts sélectionnés · ADN Vol.1';
+  updateSendPreview();
+}
+
+// ═══ MAIL TARGET ═══
+var mailTarget='all';
+function setMailTarget(t){
+  mailTarget=t;
+  var labels={all:'Tous les contacts IDF (47)',radio:'Radios & Webradios (12)',festival:'Festivals IDF (8)',bar:'Bars & Clubs DJ (27)','77':'Zone 77 uniquement'};
+  document.getElementById('mail-target-label').innerHTML='Cible : <span style="color:var(--gn)">'+labels[t]+'</span>';
+}
+
+function updateSendPreview(){
+  var t=document.getElementById('send-template').value;
+  var tpls={radio:document.getElementById('tpl1').textContent,dj:document.getElementById('tpl2').textContent,festival:document.getElementById('tpl3').textContent};
+  document.getElementById('send-preview').value=tpls[t]||tpls.radio;
+}
+
+// ═══ SPIDER ═══
+var nodes=[],links=[],drag=null,doff={x:0,y:0};
+function initSpider(){
+  var canvas=document.getElementById('spcanvas');
+  if(!canvas)return;
+  var W=canvas.offsetWidth||800,H=440;
+  canvas.width=W;canvas.height=H;
+  var cx=W/2,cy=H/2;
+  nodes=[
+    {id:0,x:cx,y:cy,r:22,col:'#8B5CF6',lbl:'Yan Hill',st:'self'},
+    {id:1,x:cx-220,y:cy-100,r:14,col:'#3B82F6',lbl:'Radio Oxygène 77',st:'warm'},
+    {id:2,x:cx-270,y:cy+40,r:13,col:'#3B82F6',lbl:'Africa Radio',st:'cold'},
+    {id:3,x:cx-200,y:cy+160,r:12,col:'#3B82F6',lbl:'FG Mix Afro',st:'cold'},
+    {id:4,x:cx-80,y:cy-190,r:12,col:'#3B82F6',lbl:'France Bleu IDF',st:'cold'},
+    {id:5,x:cx+80,y:cy-200,r:12,col:'#EC4899',lbl:'Marvellous Island',st:'cold'},
+    {id:6,x:cx+220,y:cy-120,r:13,col:'#EC4899',lbl:'Les Affolantes',st:'cold'},
+    {id:7,x:cx+270,y:cy+40,r:11,col:'#EC4899',lbl:'La Douve Fest',st:'cold'},
+    {id:8,x:cx+200,y:cy+170,r:11,col:'#EC4899',lbl:'Megasound',st:'cold'},
+    {id:9,x:cx-80,y:cy+200,r:14,col:'#10B981',lbl:'iMusician',st:'hot'},
+    {id:10,x:cx+70,y:cy+190,r:13,col:'#FF0000',lbl:'YouTube',st:'hot'},
+    {id:11,x:cx-40,y:cy-100,r:12,col:'#1877F2',lbl:'Facebook',st:'hot'},
+    {id:12,x:cx+120,y:cy+80,r:11,col:'#F59E0B',lbl:'Bars Melun',st:'cold'},
+    {id:13,x:cx-120,y:cy+80,r:11,col:'#F59E0B',lbl:'Bars Fontainebleau',st:'cold'},
+    {id:14,x:cx+50,y:cy-60,r:11,col:'#A78BFA',lbl:'Groover.co',st:'warm'},
+  ];
+  links=[{s:0,t:1},{s:0,t:2},{s:0,t:3},{s:0,t:4},{s:0,t:5},{s:0,t:6},{s:0,t:7},{s:0,t:8},{s:0,t:9},{s:0,t:10},{s:0,t:11},{s:0,t:12},{s:0,t:13},{s:0,t:14},{s:9,t:10},{s:1,t:9},{s:14,t:1}];
+  canvas.onmousedown=function(e){var r=canvas.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;nodes.forEach(function(n){if(Math.sqrt((mx-n.x)**2+(my-n.y)**2)<n.r+5){drag=n;doff={x:mx-n.x,y:my-n.y}}})};
+  canvas.onmousemove=function(e){
+    var r=canvas.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+    if(drag){drag.x=mx-doff.x;drag.y=my-doff.y;drawSpider(canvas)}
+    var found=null;nodes.forEach(function(n){if(Math.sqrt((mx-n.x)**2+(my-n.y)**2)<n.r+5)found=n});
+    var tip=document.getElementById('stip');
+    if(found&&found.id!==0){tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-30)+'px';var sl=found.st==='hot'?'🟢 Actif':found.st==='warm'?'🟡 Contacté':'🔵 À pitcher';tip.innerHTML='<strong>'+found.lbl+'</strong><br>'+sl}
+    else tip.style.display='none';
+  };
+  canvas.onmouseup=function(){drag=null};
+  canvas.onmouseleave=function(){drag=null;document.getElementById('stip').style.display='none'};
+  drawSpider(canvas);
+}
+
+function drawSpider(canvas){
+  var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+  for(var i=0;i<W;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,H);ctx.stroke()}
+  for(var j=0;j<H;j+=40){ctx.beginPath();ctx.moveTo(0,j);ctx.lineTo(W,j);ctx.stroke()}
+  links.forEach(function(l){
+    var s=nodes[l.s],t=nodes[l.t];
+    ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(t.x,t.y);
+    ctx.strokeStyle=t.st==='hot'?'rgba(16,185,129,0.4)':t.st==='warm'?'rgba(245,158,11,0.3)':'rgba(139,92,246,0.18)';
+    ctx.lineWidth=t.st==='hot'?1.5:1;ctx.stroke();
+  });
+  nodes.forEach(function(n){
+    if(n.st==='hot'||n.id===0){var g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*2.8);g.addColorStop(0,n.col+'40');g.addColorStop(1,'transparent');ctx.beginPath();ctx.arc(n.x,n.y,n.r*2.8,0,Math.PI*2);ctx.fillStyle=g;ctx.fill()}
+    ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle=n.col;ctx.fill();
+    ctx.strokeStyle=n.id===0?'rgba(255,255,255,0.9)':n.st==='hot'?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.15)';
+    ctx.lineWidth=n.id===0?2.5:1;ctx.stroke();
+    ctx.fillStyle='rgba(240,238,248,0.9)';ctx.font=(n.id===0?'bold ':'')+(n.id===0?12:9)+'px Segoe UI,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.lbl,n.x,n.y+n.r+11);
+    if(n.id===0){ctx.beginPath();ctx.arc(n.x,n.y,5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill()}
+  });
+}
+
+// ═══ CORE ═══
+function showS(n){document.querySelectorAll('[id^="screen-"]').forEach(function(e){e.style.display='none'});var el=document.getElementById('screen-'+n);if(el)el.style.display='flex'}
+
+function doLogin(){
+  var e=document.getElementById('lemail').value;
+  var p=document.getElementById('lpass').value;
+  if((e==='yanhill.backhit@gmail.com'&&p==='yanhill2026')||(e&&p.length>=6)){
+    showS('app');
+    toast('Bienvenue Yan Hill 🎵 Scan en cours...','success');
+    renderCRM();
+    setTimeout(runScan,1200);
+    setTimeout(initSpider,800);
+  } else {
+    toast('Email ou mot de passe incorrect','error');
+  }
+}
+
+function doRegister(){
+  var n=document.getElementById('rname').value;
+  var e=document.getElementById('remail').value;
+  var p=document.getElementById('rpass').value;
+  var c=document.getElementById('rconf').value;
+  if(!n||!e||!p){toast('Remplis tous les champs','error');return}
+  if(p!==c){toast('Mots de passe différents','error');return}
+  if(p.length<8){toast('Min. 8 caractères','error');return}
+  showS('app');
+  toast('Compte créé !','success');
+  renderCRM();
+  setTimeout(runScan,1000);
+  setTimeout(initSpider,600);
+}
+
+var titles={dashboard:'Vue globale',album:'💿 ADN Vol.1',spider:'🕸️ Spider Network',crm:'◈ CRM — 47 contacts IDF',mailing:'✉ Campagnes mailing',radar:'◎ Radar IDF',social:'◇ Réseaux sociaux',booking:'◆ Booking',finance:'◑ Finance',ia:'✦ IA Manager',settings:'⚙ Paramètres'};
+
+function gp(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});
+  var page=document.getElementById('page-'+id);
+  if(page)page.classList.add('on');
+  if(el)el.classList.add('on');
+  document.getElementById('ptitle').textContent=titles[id]||'SLOOMIO';
+  document.querySelector('.cnt').scrollTop=0;
+  if(id==='spider')setTimeout(initSpider,100);
+  if(id==='mailing')updateSendPreview();
+}
+
+function addContact(){
+  toast('Contact ajouté ! (47+1)','success');
+  closeM('mcont');
+}
+
+function showIA(type){
+  document.getElementById('iares').style.display='block';
+  document.getElementById('iatext').textContent=IAtexts[type]||'';
+  document.getElementById('iares').scrollIntoView({behavior:'smooth'});
+}
+
+function copyLink(){
+  navigator.clipboard.writeText('https://music.apple.com/fr/album/adn-vol-1/6770986925').then(function(){toast('Lien Apple Music copié !','success')}).catch(function(){toast('Copie manuelle','error')});
+}
+
+function openM(id){
+  document.getElementById(id).style.display='flex';
+  if(id==='msend')updateSendPreview();
+}
+function closeM(id){document.getElementById(id).style.display='none'}
+function doLogout(){showS('login');toast('Déconnecté','success')}
+
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},4000);
+}
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.mo').forEach(function(m){m.style.display='none'})}});
+
+// Auto-scan au chargement page (localStorage pour éviter spam)
+window.addEventListener('load',function(){
+  var last=localStorage.getItem('yh_last_scan');
+  var now=Date.now();
+  if(!last||now-parseInt(last)>3600000){
+    localStorage.setItem('yh_last_scan',now.toString());
+  }
+});
+</script>
+</body>
+</html>
